@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Assistant | Enterprise</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+        }
+
+        .upload-area {
+            transition: all 0.3s ease;
+            border: 2px dashed #e2e8f0;
+        }
+
+        .upload-area:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.drag-active {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+            transform: scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+        }
+
+        .template-card {
+            transition: all 0.2s ease;
+        }
+
+        .template-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .signer-row {
+            transition: all 0.2s ease;
+        }
+
+        .signer-row:hover {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .analyzing {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .preview-panel {
+            transition: all 0.3s ease;
+        }
+
+        .preview-panel:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+    <script src="js/app.js"></script>
+</body>
+</html>
