@@ -806,23 +806,18 @@ function App() {
         }
     };
 
+    const Header = () => {
+        return (
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to ContractIQ</h1>
+                <p className="text-gray-600">Streamline your contract management with AI-powered insights and DocuSign integration.</p>
+            </div>
+        );
+    };
+
     return e('div', { className: 'min-h-screen bg-gray-50' },
         // Header
-        e('header', { className: 'bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 shadow-md' },
-            e('div', { className: 'flex justify-between items-center max-w-7xl mx-auto' },
-                e('h1', { className: 'text-xl font-semibold' }, 'Contract Assistant Enterprise'),
-                e('div', { className: 'space-x-4' },
-                    e('button', {
-                        className: 'text-white hover:text-gray-200',
-                        onClick: () => setShowHelp(true)
-                    }, 'Help'),
-                    e('button', {
-                        className: 'text-white hover:text-gray-200',
-                        onClick: () => setShowSettings(true)
-                    }, 'Settings')
-                )
-            )
-        ),
+        e(Header),
         // Progress Steps
         renderNavigation(),
         // Main Content
@@ -908,7 +903,7 @@ function App() {
                 ),
                 e('div', { className: 'prose' },
                     e('h3', null, 'Getting Started'),
-                    e('p', null, 'Welcome to Contract Assistant Enterprise! Here\'s how to get started:'),
+                    e('p', null, 'Welcome to ContractIQ! Here\'s how to get started:'),
                     e('ol', null,
                         e('li', null, 'Upload a document by dragging and dropping it into the upload area, or click "browse" to select a file.'),
                         e('li', null, 'Alternatively, use one of our pre-made contract templates by selecting it from the templates section.'),
