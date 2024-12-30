@@ -1,12 +1,12 @@
 # AI-Powered Contract Negotiation Assistant
 
-![Contract Assistant Demo](static/img/demo.png)
-
-## DocuSign Good Code Hackathon 2024 Submission
+## 🏆 DocuSign Good Code Hackathon 2024 Submission
 
 A revolutionary AI-powered contract management system that transforms the way organizations handle agreements. By combining the power of OpenAI's language models with DocuSign's eSignature capabilities, this solution streamlines the entire contract lifecycle from drafting to signing.
 
-### Key Features
+[View Demo](https://github.com/RealShocky/docusign)
+
+### 🌟 Key Features
 
 #### 1. AI-Powered Contract Analysis
 - **Smart Clause Review**: Automatically analyzes contract clauses for potential issues
@@ -27,7 +27,7 @@ A revolutionary AI-powered contract management system that transforms the way or
 - **Document Generation**: Automatic PDF conversion for signing
 - **Authentication**: Secure JWT-based authentication
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.8+
@@ -39,8 +39,8 @@ A revolutionary AI-powered contract management system that transforms the way or
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/contract-negotiation-assistant.git
-cd contract-negotiation-assistant
+git clone https://github.com/RealShocky/docusign.git
+cd docusign
 ```
 
 2. Install Python dependencies:
@@ -65,7 +65,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 ### Backend
 - **Flask**: Python web framework
@@ -84,7 +84,7 @@ python app.py
 - **Environment Variables**: Protected credentials
 - **CORS**: Controlled resource sharing
 
-## API Documentation
+## 📋 API Documentation
 
 ### Contract Analysis Endpoint
 ```http
@@ -113,7 +113,7 @@ Content-Type: application/json
 }
 ```
 
-## Use Cases
+## 🎯 Use Cases
 
 1. **Legal Teams**
    - Faster contract review
@@ -130,22 +130,14 @@ Content-Type: application/json
    - Audit trail maintenance
    - Risk monitoring
 
-## Security & Compliance
+## 🔒 Security & Compliance
 
 - **Data Encryption**: All sensitive data is encrypted
 - **Access Control**: Role-based permissions
 - **Audit Logging**: Comprehensive activity tracking
 - **Compliance**: GDPR and CCPA friendly
 
-## Demo & Screenshots
-
-### Contract Analysis
-![Analysis Screenshot](static/img/analysis.png)
-
-### Signature Flow
-![Signature Screenshot](static/img/signature.png)
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -153,24 +145,24 @@ Content-Type: application/json
 4. Push to the branch
 5. Open a Pull Request
 
-## License
+## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 - DocuSign Developer Team
 - OpenAI API Team
 - Flask Framework Community
 - All contributors and testers
 
-## Support
+## 📞 Support
 
 For support, please:
-1. Check the [Issues](https://github.com/yourusername/contract-negotiation-assistant/issues) page
+1. Check the [Issues](https://github.com/RealShocky/docusign/issues) page
 2. Review existing documentation
 3. Create a new issue if needed
 
 ---
 
-Built with  for the DocuSign Good Code Hackathon 2024
+Built with ❤️ for the DocuSign Good Code Hackathon 2024
