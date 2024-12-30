@@ -1,41 +1,25 @@
-# AI-Powered Contract Negotiation Assistant
+# ContractIQ
 
-## 🏆 DocuSign Good Code Hackathon 2024 Submission
+ContractIQ streamlines contract negotiations with AI-powered insights and DocuSign integration.
 
-A revolutionary AI-powered contract management system that transforms the way organizations handle agreements. By combining the power of OpenAI's language models with DocuSign's eSignature capabilities, this solution streamlines the entire contract lifecycle from drafting to signing.
+## 🚀 Demo
 
-[View Demo](https://github.com/RealShocky/docusign)
+Check out our live demo: [ContractIQ Demo](http://vibrationrobotics.com/docusign)
 
-### 🌟 Key Features
+## ✨ Features
 
-#### 1. AI-Powered Contract Analysis
-- **Smart Clause Review**: Automatically analyzes contract clauses for potential issues
-- **Language Optimization**: Suggests clearer, more precise wording
-- **Risk Assessment**: Identifies potential legal and business risks
-- **Policy Compliance**: Ensures alignment with organization policies
+- 📄 AI-powered contract analysis
+- 📝 Pre-built contract templates
+- ✍️ Seamless DocuSign integration
+- 👥 Multiple signer support
+- 🔒 Secure document handling
+- 💡 Real-time collaboration
 
-#### 2. Interactive Negotiation Interface
-- **Real-time Collaboration**: Multiple parties can review and suggest changes
-- **Version Control**: Track all modifications with detailed audit trail
-- **Change Impact Analysis**: AI evaluates the implications of proposed changes
-- **Smart Suggestions**: Context-aware recommendations for alternative clauses
+## 🛠️ Technologies Used
 
-#### 3. DocuSign Integration
-- **Secure eSignature Flow**: Seamless integration with DocuSign's eSignature API
-- **Multiple Signer Support**: Configurable signing order and roles
-- **Template Management**: Save and reuse common contract templates
-- **Document Generation**: Automatic PDF conversion for signing
-- **Authentication**: Secure JWT-based authentication
+- Python, Flask, JavaScript, HTML5/CSS3, DocuSign API, OpenAI API, SQLite, JWT Authentication, Bootstrap, AJAX, CORS, FPDF, SQLAlchemy, Redis, Git
 
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.8+
-- DocuSign Developer Account
-- OpenAI API Key
-- Node.js and npm
-
-### Installation
+## 🚦 Getting Started
 
 1. Clone the repository:
 ```bash
@@ -43,126 +27,64 @@ git clone https://github.com/RealShocky/docusign.git
 cd docusign
 ```
 
-2. Install Python dependencies:
+2. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your credentials:
+# - DOCUSIGN_INTEGRATION_KEY
+# - DOCUSIGN_USER_ID
+# - DOCUSIGN_ACCOUNT_ID
+# - DOCUSIGN_PRIVATE_KEY_PATH
+# - OPENAI_API_KEY
+```
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Configure environment variables:
-   - Copy `.env.example` to `.env`
-   - Fill in your API keys and configuration
-
-4. Set up DocuSign Integration:
-   - Create a DocuSign Developer Account at [developers.docusign.com](https://developers.docusign.com)
-   - Create an Integration Key (Client ID)
-   - Generate RSA Keypair
-   - Save private key as 'private.key'
-   - Add public key to DocuSign
-   - Grant consent to the application
-
-5. Start the application:
+4. Run the application:
 ```bash
 python app.py
 ```
 
-## 🛠️ Technology Stack
+5. Access the web interface at `http://localhost:5000`
 
-### Backend
-- **Flask**: Python web framework
-- **SQLAlchemy**: Database ORM
-- **OpenAI API**: AI-powered analysis
-- **DocuSign eSignature API**: Digital signature integration
+## 🧪 Testing Instructions
 
-### Frontend
-- **HTML5/CSS3**: Modern, responsive design
-- **JavaScript**: Dynamic user interface
-- **Bootstrap**: UI components
-- **AJAX**: Asynchronous updates
+1. Start the Flask server
+2. Upload a sample NDA or use the pre-built template
+3. Test AI analysis with the provided prompt
+4. Add test signers (use your email)
+5. Verify DocuSign integration
 
-### Security
-- **JWT Authentication**: Secure API access
-- **Environment Variables**: Protected credentials
-- **CORS**: Controlled resource sharing
+## 📚 API Documentation
 
-## 📋 API Documentation
+### DocuSign Integration
+- JWT Authentication
+- Envelope creation
+- Multiple signer workflow
+- Template management
 
-### Contract Analysis Endpoint
-```http
-POST /api/analyze
-Content-Type: application/json
-
-{
-    "contract": "Contract text here",
-    "analysis_type": "full"
-}
-```
-
-### Send for Signature Endpoint
-```http
-POST /api/send
-Content-Type: application/json
-
-{
-    "contract": "Contract text here",
-    "signers": [
-        {
-            "name": "John Doe",
-            "email": "john@example.com"
-        }
-    ]
-}
-```
-
-## 🎯 Use Cases
-
-1. **Legal Teams**
-   - Faster contract review
-   - Consistent risk assessment
-   - Policy compliance checking
-
-2. **Business Development**
-   - Streamlined negotiation process
-   - Quick template customization
-   - Efficient signature collection
-
-3. **Compliance Officers**
-   - Automated policy checking
-   - Audit trail maintenance
-   - Risk monitoring
-
-## 🔒 Security & Compliance
-
-- **Data Encryption**: All sensitive data is encrypted
-- **Access Control**: Role-based permissions
-- **Audit Logging**: Comprehensive activity tracking
-- **Compliance**: GDPR and CCPA friendly
+### OpenAI Integration
+- Contract analysis
+- Improvement suggestions
+- Language modernization
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
+2. Create your feature branch
 3. Commit your changes
 4. Push to the branch
 5. Open a Pull Request
 
-## 📜 License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- DocuSign Developer Team
-- OpenAI API Team
-- Flask Framework Community
-- All contributors and testers
-
-## 📞 Support
-
-For support, please:
-1. Check the [Issues](https://github.com/RealShocky/docusign/issues) page
-2. Review existing documentation
-3. Create a new issue if needed
-
----
-
-Built with ❤️ for the DocuSign Good Code Hackathon 2024
+- DocuSign for the eSignature API
+- OpenAI for the GPT API
+- All contributors to this project
