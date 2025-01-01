@@ -214,6 +214,10 @@ function App() {
     const [showRiskAnalysis, setShowRiskAnalysis] = React.useState(false);
     const [riskAnalysis, setRiskAnalysis] = React.useState(null);
 
+    // Add loading states
+    const [isSending, setIsSending] = React.useState(false);
+    const [isAnalyzingRisks, setIsAnalyzingRisks] = React.useState(false);
+
     // Error Boundary
     React.useEffect(() => {
         window.onerror = (msg, url, lineNo, columnNo, error) => {
@@ -271,14 +275,10 @@ function App() {
 
     // Handle analysis
     const handleAnalyze = async (content) => {
-        if (!content) {
-            console.log('No content to analyze');
-            return;
-        }
-
-        console.log('Starting analysis of content:', content.substring(0, 100) + '...');
+        if (!content || isAnalyzing) return;
+        
+        setIsAnalyzing(true);
         try {
-            setIsAnalyzing(true);
             setAnalysis(null);
             setError(null);
 
@@ -370,7 +370,7 @@ function App() {
 
     // Update the send contract function to include positions
     const handleSendContract = async () => {
-        if (!contract || signers.some(s => !s.email || !s.name)) {
+        if (!contract || signers.some(s => !s.email || !s.name) || isSending) {
             setError({
                 type: 'error',
                 message: 'Please fill in all signer information'
@@ -379,6 +379,7 @@ function App() {
         }
 
         try {
+            setIsSending(true);
             const response = await fetch(`${API_BASE_URL}/api/send`, {
                 method: 'POST',
                 headers: {
@@ -401,10 +402,21 @@ function App() {
                     type: 'success',
                     message: 'Contract sent successfully!'
                 });
-                // Reset form
+                // Reset all state
                 setContract('');
                 setSigners([{ name: '', email: '' }]);
                 setSignaturePositions([]);
+                setAnalysis(null);
+                setIsAnalyzing(false);
+                setShowRewritePrompt(false);
+                setRewritePrompt('');
+                setUploadedFile('');
+                setCurrentStep('upload');
+                
+                // Short delay to show success message before refreshing
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             }
         } catch (err) {
             console.error('Error sending contract:', err);
@@ -412,16 +424,16 @@ function App() {
                 type: 'error',
                 message: 'Failed to send contract: ' + err.message
             });
+        } finally {
+            setIsSending(false);
         }
     };
 
     // Handle risk analysis
     const handleRiskAnalysis = async () => {
-        if (!contract) {
-            setError('Please upload or paste a contract first');
-            return;
-        }
-
+        if (!contract || isAnalyzingRisks) return;
+        
+        setIsAnalyzingRisks(true);
         try {
             const response = await fetch(`${API_BASE_URL}/api/analyze/risks`, {
                 method: 'POST',
@@ -444,6 +456,8 @@ function App() {
         } catch (error) {
             console.error('Risk analysis error:', error);
             setError(error.message);
+        } finally {
+            setIsAnalyzingRisks(false);
         }
     };
 
@@ -636,7 +650,7 @@ function App() {
 
     // Handle rewrite request
     const handleRewrite = async () => {
-        if (!rewritePrompt.trim()) {
+        if (!rewritePrompt.trim() || isRewriting) {
             setError('Please enter rewrite instructions');
             return;
         }
@@ -1006,9 +1020,10 @@ function App() {
             // Send for Signature button
             signers.length > 0 && e('div', { className: 'mt-6 flex justify-end' },
                 e('button', {
-                    className: 'px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md',
-                    onClick: handleSendContract
-                }, 'Send for Signature')
+                    className: `px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md ${isSending ? 'opacity-50 cursor-not-allowed' : ''}`,
+                    onClick: handleSendContract,
+                    disabled: isSending
+                }, isSending ? 'Sending...' : 'Send for Signature')
             )
         );
     };
@@ -1022,25 +1037,23 @@ function App() {
             e('nav', { className: 'bg-white border-b' },
                 e('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8' },
                     e('div', { className: 'flex justify-between h-16' },
-                        e('div', { className: 'flex' },
-                            e('div', { className: 'flex-shrink-0 flex items-center' },
-                                e('img', {
-                                    className: 'h-8 w-auto',
-                                    src: 'static/images/ContractIQ.svg',
-                                    alt: 'ContractIQ'
-                                })
-                            )
-                        ),
-                        e('div', { className: 'flex items-center' },
-                            e('button', {
-                                className: 'p-2 text-gray-600 hover:text-gray-800',
-                                onClick: () => setShowHelp(true)
-                            }, '?'),
-                            e('button', {
-                                className: 'p-2 ml-2 text-gray-600 hover:text-gray-800',
-                                onClick: () => setShowSettings(true)
-                            }, '⚙️')
+                        e('div', { className: 'flex-shrink-0 flex items-center' },
+                            e('img', {
+                                className: 'h-8 w-auto',
+                                src: 'static/images/ContractIQ.svg',
+                                alt: 'ContractIQ'
+                            })
                         )
+                    ),
+                    e('div', { className: 'flex items-center' },
+                        e('button', {
+                            className: 'p-2 text-gray-600 hover:text-gray-800',
+                            onClick: () => setShowHelp(true)
+                        }, '?'),
+                        e('button', {
+                            className: 'p-2 ml-2 text-gray-600 hover:text-gray-800',
+                            onClick: () => setShowSettings(true)
+                        }, '⚙️')
                     )
                 )
             )
@@ -1050,20 +1063,25 @@ function App() {
     const renderContractActions = () => {
         return e('div', { className: 'flex flex-wrap gap-2 mt-4' },
             e('button', {
-                className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700',
-                onClick: handleAnalyze,
+                className: `px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : ''}`,
+                onClick: () => handleAnalyze(contract),
                 disabled: !contract || isAnalyzing
             }, isAnalyzing ? 'Analyzing...' : 'Analyze Contract'),
             e('button', {
-                className: 'px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50',
+                className: `px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 ${isAnalyzingRisks ? 'opacity-50 cursor-not-allowed' : ''}`,
                 onClick: handleRiskAnalysis,
-                disabled: !contract || isAnalyzing
-            }, '🔍 Analyze Risks'),
+                disabled: !contract || isAnalyzingRisks
+            }, isAnalyzingRisks ? 'Analyzing Risks...' : '🔍 Analyze Risks'),
             e('button', {
-                className: 'px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700',
+                className: `px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 ${isRewriting ? 'opacity-50 cursor-not-allowed' : ''}`,
                 onClick: () => setShowRewritePrompt(true),
-                disabled: !contract
-            }, '✏️ Rewrite')
+                disabled: !contract || isRewriting
+            }, isRewriting ? 'Rewriting...' : '✏️ Rewrite'),
+            e('button', {
+                className: `px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 ${isSending ? 'opacity-50 cursor-not-allowed' : ''}`,
+                onClick: handleSendContract,
+                disabled: !contract || isSending || signers.some(s => !s.email || !s.name)
+            }, isSending ? 'Sending...' : '📤 Send for Signature')
         );
     };
 
