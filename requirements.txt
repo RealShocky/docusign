@@ -13,3 +13,4 @@ python-docx>=0.8.11
 PyPDF2>=3.0.1
 fpdf>=1.7.2
 cryptography>=41.0.0
+pdfplumber==0.10.3

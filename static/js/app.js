@@ -205,6 +205,11 @@ function App() {
     const fileInputRef = React.useRef(null);
     const textareaRef = React.useRef(null);
 
+    // Add state for signature positions
+    const [signaturePositions, setSignaturePositions] = React.useState([]);
+    const [isAnalyzingPositions, setIsAnalyzingPositions] = React.useState(false);
+    const [showPositionSelector, setShowPositionSelector] = React.useState(false);
+
     // Error Boundary
     React.useEffect(() => {
         window.onerror = (msg, url, lineNo, columnNo, error) => {
@@ -305,6 +310,104 @@ function App() {
             setAnalysis(null);
         } finally {
             setIsAnalyzing(false);
+        }
+    };
+
+    // Function to analyze signature positions
+    const analyzeSignaturePositions = async () => {
+        if (!contract) return;
+        
+        setIsAnalyzingPositions(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/analyze-signature-positions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: contract })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to analyze signature positions');
+            }
+            
+            const result = await response.json();
+            if (result.success && result.positions) {
+                // Parse the positions JSON string
+                const positions = typeof result.positions === 'string' 
+                    ? JSON.parse(result.positions) 
+                    : result.positions;
+                
+                setSignaturePositions(positions);
+                
+                // Show success message with suggestions
+                setError({
+                    type: 'success',
+                    message: 'AI has suggested signature positions. You can review and adjust them before sending.'
+                });
+            }
+        } catch (err) {
+            console.error('Error analyzing signature positions:', err);
+            setError({
+                type: 'error',
+                message: 'Failed to analyze signature positions: ' + err.message
+            });
+        } finally {
+            setIsAnalyzingPositions(false);
+        }
+    };
+
+    // Function to handle signature position selection
+    const handlePositionSelect = (signerIndex, position) => {
+        const newPositions = [...signaturePositions];
+        newPositions[signerIndex] = position;
+        setSignaturePositions(newPositions);
+    };
+
+    // Update the send contract function to include positions
+    const handleSendContract = async () => {
+        if (!contract || signers.some(s => !s.email || !s.name)) {
+            setError({
+                type: 'error',
+                message: 'Please fill in all signer information'
+            });
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/send`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contract,
+                    signers,
+                    signature_positions: signaturePositions
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to send contract');
+            }
+
+            const result = await response.json();
+            if (result.success) {
+                setError({
+                    type: 'success',
+                    message: 'Contract sent successfully!'
+                });
+                // Reset form
+                setContract('');
+                setSigners([{ name: '', email: '' }]);
+                setSignaturePositions([]);
+            }
+        } catch (err) {
+            console.error('Error sending contract:', err);
+            setError({
+                type: 'error',
+                message: 'Failed to send contract: ' + err.message
+            });
         }
     };
 
@@ -754,56 +857,38 @@ function App() {
             signers.length > 0 && e('div', { className: 'mt-6 flex justify-end' },
                 e('button', {
                     className: 'px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md',
-                    onClick: handleSendForSignature
+                    onClick: handleSendContract
                 }, 'Send for Signature')
             )
         );
     };
 
-    const handleSendForSignature = async () => {
-        if (!contract || signers.length === 0) {
-            setError('Please add contract and signers before sending');
-            return;
-        }
-
-        // Validate signers
-        const invalidSigners = signers.filter(s => !s.name || !s.email);
-        if (invalidSigners.length > 0) {
-            setError('Please fill in all signer names and emails');
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/send`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contract,
-                    signers
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to send contract');
-            }
-
-            const result = await response.json();
-            if (result.success) {
-                alert('Contract sent successfully!');
-                // Reset form
-                setContract('');
-                setSigners([]);
-                setAnalysis('');
-                setSelectedTemplate(null);
-            } else {
-                throw new Error(result.error || 'Failed to send contract');
-            }
-        } catch (error) {
-            console.error('Send error:', error);
-            setError(error.message);
-        }
+    const renderPositionSelector = () => {
+        if (!showPositionSelector) return null;
+        
+        return (
+            <div className="position-selector">
+                <h3>Select Signature Positions</h3>
+                {signers.map((signer, index) => (
+                    <div key={index} className="signer-position">
+                        <h4>{signer.name || `Signer ${index + 1}`}</h4>
+                        {signaturePositions[index] && (
+                            <div className="position-info">
+                                <p><strong>Description:</strong> {signaturePositions[index].description}</p>
+                                <p><strong>Location:</strong> {signaturePositions[index].anchor_text}</p>
+                                <p><strong>Alignment:</strong> {signaturePositions[index].align}</p>
+                            </div>
+                        )}
+                    </div>
+                ))}
+                <button 
+                    onClick={analyzeSignaturePositions}
+                    disabled={isAnalyzingPositions || !contract}
+                >
+                    {isAnalyzingPositions ? 'Analyzing...' : 'Analyze Signature Positions'}
+                </button>
+            </div>
+        );
     };
 
     const Header = () => {
@@ -892,7 +977,8 @@ function App() {
                         spellCheck: false
                     })
                 ),
-                renderSigners()
+                renderSigners(),
+                renderPositionSelector()
             )
         ),
 

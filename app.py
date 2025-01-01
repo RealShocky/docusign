@@ -14,11 +14,14 @@ import openai
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from docusign_esign import ApiClient, EnvelopesApi, EnvelopeDefinition, Document, Signer, SignHere, Tabs, Recipients
+from docusign_esign import ApiClient, EnvelopesApi, EnvelopeDefinition, Document, Signer, SignHere, Tabs, Recipients, Text
 import base64
 import jwt
 import time
 from fpdf import FPDF
+import json
+import pdfplumber
+import os
 
 # Debug: Print current working directory
 print("Current working directory:", os.getcwd())
@@ -274,10 +277,15 @@ def rewrite_contract():
     content = request.json.get('content')
     instructions = request.json.get('instructions')
     
+    print(f"\nReceived rewrite request:")
+    print(f"Instructions: {instructions}")
+    print(f"Content length: {len(content) if content else 0} characters")
+    
     if not content or not instructions:
         return jsonify({"error": "Content and instructions are required"}), 400
     
     try:
+        print("Calling OpenAI for contract rewriting...")
         # Use OpenAI for contract rewriting
         response = openai.ChatCompletion.create(
             model="gpt-4-1106-preview",
@@ -301,6 +309,8 @@ Original Contract:
         )
         
         rewritten = response.choices[0].message['content']
+        print("Successfully rewrote contract")
+        print(f"New length: {len(rewritten)} characters")
         
         return jsonify({
             "rewritten": rewritten,
@@ -310,6 +320,8 @@ Original Contract:
     except Exception as e:
         print("\nError occurred during rewrite:")
         print("Error details:", str(e))
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": f"Failed to rewrite contract: {str(e)}"}), 500
 
 @app.route('/api/templates')
@@ -526,6 +538,139 @@ def compare_versions(contract_id):
         
     return jsonify(comparison)
 
+@app.route('/api/analyze-signature-positions', methods=['POST'])
+def analyze_signature_positions():
+    if not request.json or 'content' not in request.json:
+        return jsonify({"error": "No contract text provided"}), 400
+    
+    try:
+        contract_text = request.json['content']
+        
+        # Use OpenAI for signature placement analysis
+        response = openai.ChatCompletion.create(
+            model="gpt-4-1106-preview",
+            messages=[
+                {"role": "system", "content": """You are a legal document analysis assistant specialized in determining optimal signature placements.
+                Analyze the contract and identify the most appropriate locations for signatures based on:
+                1. Standard signature conventions
+                2. Legal requirements
+                3. Document structure and formatting
+                4. Number of signers
+                
+                Return a JSON array where each item contains:
+                {
+                    "description": "Detailed explanation of why this is a good signature location",
+                    "anchor_text": "The text that precedes or indicates where the signature should go",
+                    "offset_type": "before" or "after" (relative to anchor_text),
+                    "align": "left", "right", or "center",
+                    "signer_role": "The role of who should sign here (e.g., 'client', 'company', etc.)"
+                }"""},
+                {"role": "user", "content": f"Analyze this contract and determine optimal signature positions:\n\n{contract_text}"}
+            ],
+            temperature=0.7
+        )
+        
+        # Extract the suggestions
+        suggestions = response.choices[0].message['content']
+        
+        return jsonify({
+            "success": True,
+            "positions": suggestions
+        })
+        
+    except Exception as e:
+        print(f"Error analyzing signature positions: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+def analyze_signature_locations(contract_text):
+    """Use GPT to find exact signature locations in the contract"""
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4-1106-preview",
+            messages=[
+                {"role": "system", "content": """You are an expert at analyzing legal documents for signature placements.
+                Look for these common signature patterns:
+                
+                1. Basic signature line:
+                   By: ____________________
+                
+                2. Role-based signatures with labels like:
+                   - [PARTY A] / [PARTY B]
+                   - [SERVICE PROVIDER] / [CLIENT]
+                   - [COMPANY] / [EMPLOYEE]
+                   - [SELLER] / [BUYER]
+                   
+                3. Additional fields like:
+                   Name:
+                   Title:
+                   Date:
+                
+                For each signature location found, determine:
+                1. The role (e.g., "provider", "client", "party_a", "party_b", "company", "employee", "seller", "buyer")
+                2. The exact anchor text ("By: ___" or similar)
+                3. Any additional context (role label above the signature)
+                4. Whether it's a primary or secondary signer
+                
+                Return a JSON array of signature locations, each containing:
+                {
+                    "role": "The signer role (e.g., provider, client)",
+                    "anchor_text": "The exact text that precedes the signature line",
+                    "context": "The role label or surrounding text",
+                    "is_primary": true/false,
+                    "additional_fields": ["Name", "Title", "Date"] (if present)
+                }"""},
+                {"role": "user", "content": f"Find all signature locations in this contract:\n\n{contract_text}"}
+            ],
+            temperature=0
+        )
+        
+        locations = json.loads(response.choices[0].message['content'])
+        print("AI found signature locations:", locations)
+        return locations
+    except Exception as e:
+        print(f"Error analyzing signature locations: {str(e)}")
+        return None
+
+def find_text_position_in_pdf(pdf_content, search_text):
+    """Find the y-coordinate of specific text in the PDF"""
+    try:
+        print(f"Looking for text: '{search_text}' in PDF...")
+        # Create a temporary PDF file
+        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_file:
+            tmp_file.write(pdf_content)
+            tmp_file.flush()
+            print(f"Created temporary PDF file: {tmp_file.name}")
+            
+            # Extract text and positions using pdfplumber
+            with pdfplumber.open(tmp_file.name) as pdf:
+                print("Opened PDF with pdfplumber")
+                page = pdf.pages[0]  # Assume signatures are on first page
+                words = page.extract_words(x_tolerance=3, y_tolerance=3)
+                print(f"Found {len(words)} words on page")
+                
+                # Look for the search text
+                for word in words:
+                    if search_text.lower() in word['text'].lower():
+                        print(f"Found match at: x={word['x0']}, y={word['y0']}")
+                        # Return position, converting from PDF coordinates
+                        return {
+                            'x': word['x0'],
+                            'y': word['y0'],
+                            'page': 1
+                        }
+                print(f"Text '{search_text}' not found in PDF")
+        return None
+    except Exception as e:
+        print(f"Error finding text position: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return None
+    finally:
+        # Clean up temp file
+        if 'tmp_file' in locals():
+            os.unlink(tmp_file.name)
+            print("Cleaned up temporary PDF file")
+
 @app.route('/api/send', methods=['POST'])
 def send_contract():
     if not request.json:
@@ -533,6 +678,7 @@ def send_contract():
         
     contract_text = request.json.get('contract')
     signers = request.json.get('signers')
+    use_ai_positioning = request.json.get('use_ai_positioning', False)
     
     if not contract_text or not signers:
         return jsonify({"error": "Contract and signers are required"}), 400
@@ -544,28 +690,113 @@ def send_contract():
         doc_b64 = base64.b64encode(pdf_bytes).decode('utf-8')
         
         print("Creating envelope definition...")
-        # Create list to store signers
         docusign_signers = []
         
-        # Add signers
+        # Try AI-based positioning if requested
+        signature_positions = None
+        if use_ai_positioning:
+            print("Attempting AI-based signature positioning...")
+            try:
+                signature_locations = analyze_signature_locations(contract_text)
+                if signature_locations:
+                    signature_positions = []
+                    for loc in signature_locations:
+                        position = find_text_position_in_pdf(pdf_bytes, loc['anchor_text'])
+                        if not position and 'context' in loc:
+                            position = find_text_position_in_pdf(pdf_bytes, loc['context'])
+                            if position:
+                                position['y'] += 20  # Move down by 20 points
+                        if position:
+                            signature_positions.append({
+                                'position': position,
+                                'additional_fields': loc.get('additional_fields', [])
+                            })
+                    print(f"Found {len(signature_positions)} signature positions using AI")
+            except Exception as e:
+                print(f"AI positioning failed, falling back to default: {str(e)}")
+                signature_positions = None
+        
+        # Use default positions if AI positioning failed or wasn't requested
+        if not signature_positions:
+            print("Using default signature positions...")
+            # Standard PDF page is 612 x 792 points
+            # Place signatures in bottom third of page with proper margins
+            signature_positions = [
+                {
+                    'position': {
+                        'x': 50,  # Left margin
+                        'y': 650,  # About 142 points from bottom
+                        'page': 1
+                    },
+                    'additional_fields': []
+                },
+                {
+                    'position': {
+                        'x': 350,  # Right side of page
+                        'y': 650,  # Same vertical position
+                        'page': 1
+                    },
+                    'additional_fields': []
+                }
+            ]
+        
+        # Add signers with their signature positions
         for i, signer in enumerate(signers, 1):
             print(f"Adding signer {i}: {signer['name']} ({signer['email']})")
             
-            # Add signature field at the bottom
+            # Get position for this signer
+            sig_data = signature_positions[min(i-1, len(signature_positions)-1)]
+            position = sig_data['position']
+            
+            # Add signature field
             sign_here = SignHere(
                 document_id="1",
-                page_number="1",
+                page_number=str(position['page']),
                 recipient_id=str(i),
-                x_position="100",
-                y_position="600"
+                x_position=str(int(float(position['x']))),
+                y_position=str(int(float(position['y'])))
             )
+            
+            # Add name field
+            name_text = Text(
+                document_id="1",
+                page_number=str(position['page']),
+                recipient_id=str(i),
+                x_position=str(int(float(position['x']) + 20)),  # Offset slightly from signature
+                y_position=str(int(float(position['y']) - 30)),  # Place above signature
+                font="helvetica",
+                font_size="size11",
+                value=signer['name']
+            )
+            
+            # Add any additional fields from AI analysis
+            additional_tabs = [name_text]
+            y_offset = 30
+            for field in sig_data['additional_fields']:
+                additional_tabs.append(
+                    Text(
+                        document_id="1",
+                        page_number=str(position['page']),
+                        recipient_id=str(i),
+                        x_position=str(int(float(position['x']))),
+                        y_position=str(int(float(position['y']) + y_offset)),
+                        font="helvetica",
+                        font_size="size11",
+                        tab_label=field.lower(),
+                        width=200
+                    )
+                )
+                y_offset += 30
             
             signer_obj = Signer(
                 email=signer['email'],
                 name=signer['name'],
                 recipient_id=str(i),
                 routing_order=str(i),
-                tabs=Tabs(sign_here_tabs=[sign_here])
+                tabs=Tabs(
+                    sign_here_tabs=[sign_here],
+                    text_tabs=additional_tabs
+                )
             )
             
             docusign_signers.append(signer_obj)
@@ -615,7 +846,7 @@ def send_contract():
 def create_pdf_from_text(text):
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("Arial", size=10)
     
     # Split text into lines and write to PDF
     lines = text.split('\n')
