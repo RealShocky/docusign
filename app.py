@@ -843,15 +843,29 @@ def send_contract():
         return jsonify({"error": f"Failed to send contract: {str(e)}"}), 500
 
 def create_pdf_from_text(text):
+    from fpdf import FPDF
+    
+    # Create PDF object
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", size=10)
+    pdf.set_font('Arial', size=10)
+    
+    # Replace problematic Unicode characters with ASCII equivalents
+    text = text.replace('\u2013', '-')  # Replace en-dash with hyphen
+    text = text.replace('\u2014', '--')  # Replace em-dash with double hyphen
+    text = text.replace('\u2018', "'")   # Replace left single quote
+    text = text.replace('\u2019', "'")   # Replace right single quote
+    text = text.replace('\u201C', '"')   # Replace left double quote
+    text = text.replace('\u201D', '"')   # Replace right double quote
+    text = text.replace('\u2026', '...') # Replace ellipsis
     
     # Split text into lines and write to PDF
     lines = text.split('\n')
     for line in lines:
+        # Encode line to ASCII, replacing unknown characters
+        line = line.encode('ascii', 'replace').decode('ascii')
         pdf.multi_cell(0, 10, txt=line)
-        
+    
     # Get PDF as bytes
     return pdf.output(dest='S').encode('latin-1')
 

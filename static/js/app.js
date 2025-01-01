@@ -1034,7 +1034,7 @@ function App() {
                             e('div', { className: 'flex-shrink-0 flex items-center' },
                                 e('img', {
                                     className: 'h-8 w-auto',
-                                    src: '/static/img/logo.png',
+                                    src: 'static/images/ContractIQ.svg',
                                     alt: 'ContractIQ'
                                 })
                             )
@@ -1096,24 +1096,6 @@ function App() {
                         'File loaded: ', uploadedFile
                     ),
                     
-                    // Contract Actions (after file upload)
-                    contract && e('div', { className: 'flex gap-2 mb-4 mt-4' },
-                        e('button', {
-                            className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700',
-                            onClick: () => handleAnalyze(contract),
-                            disabled: isAnalyzing
-                        }, isAnalyzing ? 'Analyzing...' : 'Analyze Contract'),
-                        e('button', {
-                            className: 'px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700',
-                            onClick: handleRiskAnalysis,
-                            disabled: isAnalyzing
-                        }, '🔍 Risk Analysis'),
-                        e('button', {
-                            className: 'px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700',
-                            onClick: () => setShowRewritePrompt(true)
-                        }, '✏️ Rewrite')
-                    ),
-
                     // Upload Area
                     !uploadedFile && e('div', {
                         className: `upload-area rounded-lg p-8 text-center ${dragActive ? 'drag-active' : ''}`,
@@ -1155,39 +1137,19 @@ function App() {
                     )
                 ),
 
-                contract && e('div', { className: 'bg-blue-50 p-6 rounded-xl mb-6' },
+                // Analysis Section
+                contract && e('div', { className: 'bg-blue-50 p-6 rounded-xl mt-6' },
                     e('div', { className: 'flex items-center justify-between mb-4' },
                         e('div', { className: 'flex items-center gap-3' },
-                            e('img', {
-                                src: '/static/img/robot.png',
-                                alt: 'AI',
-                                className: 'w-8 h-8'
-                            }),
                             e('div', null,
                                 e('h3', { className: 'text-lg font-semibold' }, 'AI Analysis'),
                                 e('p', { className: 'text-sm text-gray-600' }, 'Powered by GPT-4')
                             )
-                        ),
-                        e('div', { className: 'flex gap-2' },
-                            e('button', {
-                                className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700',
-                                onClick: () => handleAnalyze(contract),
-                                disabled: isAnalyzing
-                            }, isAnalyzing ? 'Analyzing...' : 'Analyze Contract'),
-                            e('button', {
-                                className: 'px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700',
-                                onClick: handleRiskAnalysis,
-                                disabled: isAnalyzing
-                            }, '🔍 Risk Analysis'),
-                            e('button', {
-                                className: 'px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700',
-                                onClick: () => setShowRewritePrompt(true)
-                            }, '✏️ Rewrite')
                         )
                     ),
+                    renderContractActions(),
                     analysis && e('div', { className: 'mt-4' }, renderAnalysis())
-                ),
-                renderContractActions(),
+                )
             ),
 
             // Right Column - Contract Preview and Signers
