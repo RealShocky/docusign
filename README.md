@@ -82,7 +82,16 @@ pip install -r requirements.txt
    - Add public key to DocuSign
    - Grant consent to the application
 
-5. Start the application:
+5. Initialize the database:
+```bash
+# Run the database migration script
+python migrations/add_invitations.py
+
+# Verify the database was created
+# You should see a new contracts.db file in your project directory
+```
+
+6. Start the application:
 ```bash
 python app.py
 ```

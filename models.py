@@ -73,6 +73,7 @@ class Contract(Base):
     comments = relationship("Comment", back_populates="contract")
     versions = relationship("ContractVersion", back_populates="contract")
     collaborators = relationship("User", secondary=contract_collaborators)
+    invitations = relationship("Invitation", backref="contract")
 
 class ContractVersion(Base):
     __tablename__ = 'contract_versions'
@@ -103,6 +104,21 @@ class Comment(Base):
     contract = relationship("Contract", back_populates="comments")
     user = relationship("User", back_populates="comments")
     replies = relationship("Comment")
+
+class Invitation(Base):
+    __tablename__ = 'invitations'
+    
+    id = Column(Integer, primary_key=True)
+    contract_id = Column(Integer, ForeignKey('contracts.id'))
+    email = Column(String(255), nullable=False)
+    role = Column(String(50), default='viewer')  # viewer, editor, admin
+    token = Column(String(255), unique=True, nullable=False)
+    status = Column(String(50), default='pending')  # pending, accepted, rejected
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime, nullable=False)
+    
+    # Relationships
+    contract = relationship("Contract")
 
 class CalendarEvent(Base):
     __tablename__ = 'calendar_events'

@@ -9,6 +9,7 @@ from services.file_service import FileService
 from services.template_service import TemplateService
 from services.collaboration_service import CollaborationService
 from services.ai_service import AIService
+from services.invitation_service import InvitationService
 from models import User, Contract, Template
 import openai
 import smtplib
@@ -87,6 +88,7 @@ upload_folder = os.path.join(os.path.dirname(__file__), 'uploads')
 os.makedirs(upload_folder, exist_ok=True)
 file_service = FileService(upload_folder)
 ai_service = AIService()
+invitation_service = InvitationService(DBSession())
 
 # DocuSign Configuration
 app.config.update(
@@ -996,6 +998,56 @@ def analyze_risks():
     except Exception as e:
         print(f"Error in risk analysis endpoint: {str(e)}")
         return jsonify({"error": f"Risk analysis failed: {str(e)}"}), 500
+
+# Invitation Routes
+@app.route('/api/contracts/<int:contract_id>/invitations', methods=['POST'])
+def invite_collaborator(contract_id):
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        role = data.get('role', 'viewer')
+        
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+            
+        invitation = invitation_service.create_invitation(contract_id, email, role)
+        return jsonify({
+            'id': invitation.id,
+            'email': invitation.email,
+            'role': invitation.role,
+            'status': invitation.status,
+            'expires_at': invitation.expires_at.isoformat()
+        }), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/contracts/<int:contract_id>/invitations', methods=['GET'])
+def list_invitations(contract_id):
+    try:
+        invitations = invitation_service.list_invitations(contract_id)
+        return jsonify([{
+            'id': inv.id,
+            'email': inv.email,
+            'role': inv.role,
+            'status': inv.status,
+            'expires_at': inv.expires_at.isoformat()
+        } for inv in invitations]), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/invitations/<token>/accept', methods=['POST'])
+def accept_invitation(token):
+    try:
+        contract = invitation_service.accept_invitation(token)
+        if not contract:
+            return jsonify({'error': 'Invalid or expired invitation'}), 400
+            
+        return jsonify({
+            'message': 'Invitation accepted successfully',
+            'contract_id': contract.id
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

@@ -221,6 +221,9 @@ function App() {
     // Add new state for success modal
     const [showSuccessModal, setShowSuccessModal] = React.useState(false);
 
+    // Add state for collaboration
+    const [refreshKey, setRefreshKey] = React.useState(0);
+
     // Error Boundary
     React.useEffect(() => {
         window.onerror = (msg, url, lineNo, columnNo, error) => {
@@ -1082,6 +1085,27 @@ function App() {
             )
         );
     };
+
+    // Contract View Component
+    function ContractView({ contract, onClose }) {
+        return e('div', { className: 'contract-view' },
+            e('div', { className: 'contract-header' },
+                e('h2', null, contract.title),
+                e('button', { onClick: onClose, className: 'close-btn' }, '×')
+            ),
+            e('div', { className: 'contract-content' }, contract.content),
+            e('div', { className: 'collaboration-section' },
+                e(InviteCollaborator, { 
+                    contractId: contract.id,
+                    onInviteSent: () => setRefreshKey(prev => prev + 1)
+                }),
+                e(CollaboratorsList, { 
+                    contractId: contract.id,
+                    key: refreshKey 
+                })
+            )
+        );
+    }
 
     const Header = () => {
         return e('div', { className: 'mb-8' },
