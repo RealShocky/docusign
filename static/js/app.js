@@ -817,7 +817,9 @@ function App() {
 
     return e('div', { className: 'min-h-screen bg-gray-50' },
         // Header
-        e(Header),
+        e('div', { className: 'bg-blue-600 text-white p-4 text-center' },
+            e('h1', { className: 'text-2xl font-bold' }, 'ContractIQ')
+        ),
         // Progress Steps
         renderNavigation(),
         // Main Content
