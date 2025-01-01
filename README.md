@@ -1,17 +1,17 @@
 # AI-Powered Contract Negotiation Assistant
 
-## 🏆 DocuSign Good Code Hackathon 2024 Submission
+## DocuSign Unlocked Hackathon 2024 Submission
 
 A revolutionary AI-powered contract management system that transforms the way organizations handle agreements. By combining the power of OpenAI's language models with DocuSign's eSignature capabilities, this solution streamlines the entire contract lifecycle from drafting to signing.
 
 [View Demo](https://github.com/RealShocky/docusign)
 
-### 🌟 Key Features
+### Key Features
 
 #### 1. AI-Powered Contract Analysis
 - **Smart Clause Review**: Automatically analyzes contract clauses for potential issues
 - **Language Optimization**: Suggests clearer, more precise wording
-- **Risk Assessment**: Identifies potential legal and business risks
+- **Risk Assessment**: Color-coded risk scores with detailed clause-by-clause analysis
 - **Policy Compliance**: Ensures alignment with organization policies
 
 #### 2. Interactive Negotiation Interface
@@ -24,15 +24,15 @@ A revolutionary AI-powered contract management system that transforms the way or
 - **Secure eSignature Flow**: Seamless integration with DocuSign's eSignature API
 - **Multiple Signer Support**: Configurable signing order and roles
 - **Template Management**: Save and reuse common contract templates
-- **Document Generation**: Automatic PDF conversion for signing
+- **Document Generation**: Automatic PDF conversion with Unicode support
 - **Authentication**: Secure JWT-based authentication
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.8+
 - DocuSign Developer Account
-- OpenAI API Key
+- OpenAI API Key (GPT-4 access required)
 - Node.js and npm
 
 ### Installation
@@ -50,7 +50,14 @@ pip install -r requirements.txt
 
 3. Configure environment variables:
    - Copy `.env.example` to `.env`
-   - Fill in your API keys and configuration
+   - Fill in your API keys and configuration:
+     ```
+     OPENAI_API_KEY=your_openai_api_key
+     DOCUSIGN_AUTH_SERVER=account-d.docusign.com
+     DOCUSIGN_BASE_PATH=https://demo.docusign.net/restapi
+     DATABASE_URL=sqlite:///contracts.db
+     FLASK_APP=app.py
+     ```
 
 4. Set up DocuSign Integration:
    - Create a DocuSign Developer Account at [developers.docusign.com](https://developers.docusign.com)
@@ -65,26 +72,27 @@ pip install -r requirements.txt
 python app.py
 ```
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend
 - **Flask**: Python web framework
 - **SQLAlchemy**: Database ORM
-- **OpenAI API**: AI-powered analysis
+- **OpenAI GPT-4**: AI-powered analysis and risk assessment
 - **DocuSign eSignature API**: Digital signature integration
+- **FPDF**: PDF generation with Unicode support
 
 ### Frontend
-- **HTML5/CSS3**: Modern, responsive design
-- **JavaScript**: Dynamic user interface
-- **Bootstrap**: UI components
-- **AJAX**: Asynchronous updates
+- **React**: Dynamic UI components
+- **Tailwind CSS**: Modern, responsive design
+- **JavaScript**: Interactive features
+- **Fetch API**: Asynchronous data handling
 
 ### Security
 - **JWT Authentication**: Secure API access
 - **Environment Variables**: Protected credentials
 - **CORS**: Controlled resource sharing
 
-## 📋 API Documentation
+## API Documentation
 
 ### Contract Analysis Endpoint
 ```http
@@ -92,8 +100,39 @@ POST /api/analyze
 Content-Type: application/json
 
 {
-    "contract": "Contract text here",
-    "analysis_type": "full"
+    "content": "Contract text here"
+}
+
+Response:
+{
+    "analysis": {
+        "summary": "...",
+        "suggestions": [...],
+        "risks": [...]
+    }
+}
+```
+
+### Risk Assessment Endpoint
+```http
+POST /api/analyze/risks
+Content-Type: application/json
+
+{
+    "content": "Contract text here"
+}
+
+Response:
+{
+    "overall_risk_score": 5,
+    "risk_summary": "...",
+    "clauses": [
+        {
+            "clause": "...",
+            "risk_level": "high|medium|low",
+            "details": "..."
+        }
+    ]
 }
 ```
 
@@ -103,7 +142,7 @@ POST /api/send
 Content-Type: application/json
 
 {
-    "contract": "Contract text here",
+    "contract": "Contract text",
     "signers": [
         {
             "name": "John Doe",
@@ -113,50 +152,50 @@ Content-Type: application/json
 }
 ```
 
-## 🎯 Use Cases
+## Changelog
 
-1. **Legal Teams**
-   - Faster contract review
-   - Consistent risk assessment
-   - Policy compliance checking
+### Latest Updates (December 31, 2024)
 
-2. **Business Development**
-   - Streamlined negotiation process
-   - Quick template customization
-   - Efficient signature collection
+#### Features Added
+- **Enhanced Risk Assessment**:
+  - Added color-coded risk levels (red, yellow, green)
+  - Implemented detailed clause-by-clause analysis
+  - Added overall risk score calculation
+  - Improved risk analysis UI with modern design
 
-3. **Compliance Officers**
-   - Automated policy checking
-   - Audit trail maintenance
-   - Risk monitoring
+- **PDF Generation Improvements**:
+  - Added Unicode character support
+  - Fixed special character handling
+  - Improved formatting consistency
 
-## 🔒 Security & Compliance
+- **UI Enhancements**:
+  - Added ContractIQ logo
+  - Improved layout and responsiveness
+  - Removed duplicate UI elements
+  - Enhanced modal designs
 
-- **Data Encryption**: All sensitive data is encrypted
-- **Access Control**: Role-based permissions
-- **Audit Logging**: Comprehensive activity tracking
-- **Compliance**: GDPR and CCPA friendly
+#### Bug Fixes
+- Fixed PDF generation Unicode encoding issues
+- Resolved duplicate UI elements in contract analysis
+- Fixed risk assessment display issues
+- Improved error handling in API endpoints
 
-## 🤝 Contributing
+## License
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 📜 License
+## Contributing
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - DocuSign Developer Team
 - OpenAI API Team
 - Flask Framework Community
 - All contributors and testers
 
-## 📞 Support
+## Support
 
 For support, please:
 1. Check the [Issues](https://github.com/RealShocky/docusign/issues) page
@@ -165,4 +204,4 @@ For support, please:
 
 ---
 
-Built with ❤️ for the DocuSign Good Code Hackathon 2024
+Built with for the DocuSign Good Code Hackathon 2024
