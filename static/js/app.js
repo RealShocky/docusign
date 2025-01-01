@@ -218,6 +218,9 @@ function App() {
     const [isSending, setIsSending] = React.useState(false);
     const [isAnalyzingRisks, setIsAnalyzingRisks] = React.useState(false);
 
+    // Add new state for success modal
+    const [showSuccessModal, setShowSuccessModal] = React.useState(false);
+
     // Error Boundary
     React.useEffect(() => {
         window.onerror = (msg, url, lineNo, columnNo, error) => {
@@ -398,25 +401,7 @@ function App() {
 
             const result = await response.json();
             if (result.success) {
-                setError({
-                    type: 'success',
-                    message: 'Contract sent successfully!'
-                });
-                // Reset all state
-                setContract('');
-                setSigners([{ name: '', email: '' }]);
-                setSignaturePositions([]);
-                setAnalysis(null);
-                setIsAnalyzing(false);
-                setShowRewritePrompt(false);
-                setRewritePrompt('');
-                setUploadedFile('');
-                setCurrentStep('upload');
-                
-                // Short delay to show success message before refreshing
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
+                setShowSuccessModal(true);
             }
         } catch (err) {
             console.error('Error sending contract:', err);
@@ -854,6 +839,76 @@ function App() {
         );
     }
 
+    // Success Modal Component
+    const SuccessModal = () => {
+        return e('div', {
+            className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50',
+            onClick: () => {
+                setShowSuccessModal(false);
+                // Reset state after closing modal
+                setContract('');
+                setSigners([{ name: '', email: '' }]);
+                setSignaturePositions([]);
+                setAnalysis(null);
+                setIsAnalyzing(false);
+                setShowRewritePrompt(false);
+                setRewritePrompt('');
+                setUploadedFile('');
+            }
+        },
+            e('div', {
+                className: 'bg-white rounded-lg p-8 max-w-md w-full mx-4 transform transition-all',
+                onClick: e => e.stopPropagation()
+            },
+                e('div', { className: 'text-center' },
+                    e('div', { className: 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4' },
+                        e('svg', {
+                            className: 'h-8 w-8 text-green-600',
+                            fill: 'none',
+                            viewBox: '0 0 24 24',
+                            stroke: 'currentColor'
+                        },
+                            e('path', {
+                                strokeLinecap: 'round',
+                                strokeLinejoin: 'round',
+                                strokeWidth: '2',
+                                d: 'M5 13l4 4L19 7'
+                            })
+                        )
+                    ),
+                    e('h3', { className: 'text-2xl leading-6 font-medium text-gray-900 mb-4' },
+                        'Document Sent Successfully!'
+                    ),
+                    e('div', { className: 'text-gray-600 mb-6' },
+                        e('p', { className: 'mb-2' },
+                            'Your document has been sent for signature. All parties will receive an email with instructions.'
+                        ),
+                        e('p', {},
+                            'You can track the signing progress in your DocuSign account.'
+                        )
+                    ),
+                    e('div', { className: 'mt-6' },
+                        e('button', {
+                            className: 'w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
+                            onClick: () => {
+                                setShowSuccessModal(false);
+                                // Reset state after closing modal
+                                setContract('');
+                                setSigners([{ name: '', email: '' }]);
+                                setSignaturePositions([]);
+                                setAnalysis(null);
+                                setIsAnalyzing(false);
+                                setShowRewritePrompt(false);
+                                setRewritePrompt('');
+                                setUploadedFile('');
+                            }
+                        }, 'Start New Document')
+                    )
+                )
+            )
+        );
+    };
+
     const renderPositionSelector = () => {
         if (!showPositionSelector) return null;
         
@@ -1086,6 +1141,7 @@ function App() {
     };
 
     return e('div', { className: 'min-h-screen bg-gray-50' },
+        showSuccessModal && e(SuccessModal),
         // Header
         e(Header),
         // Progress Steps
