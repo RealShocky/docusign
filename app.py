@@ -22,6 +22,7 @@ from fpdf import FPDF
 import json
 import pdfplumber
 import os
+from typing import Dict, List, Any
 
 # Debug: Print current working directory
 print("Current working directory:", os.getcwd())
@@ -912,6 +913,74 @@ Document Signing System"""
     except Exception as e:
         print(f"Failed to send email to {recipient_email}: {str(e)}")
         return False
+
+class RiskService:
+    def __init__(self):
+        self.risk_prompt = """
+        Analyze the following contract for potential risks and issues. Consider:
+        1. Legal compliance
+        2. Financial risks
+        3. Liability concerns
+        4. Ambiguous language
+        5. Missing clauses
+        6. Unfavorable terms
+        
+        Provide a detailed analysis with:
+        1. Overall risk score (1-10)
+        2. Risk summary
+        3. Specific clause analysis
+        
+        Contract:
+        {contract_text}
+        """
+
+    def analyze_contract_risks(self, contract_text: str) -> Dict[str, Any]:
+        try:
+            # Prepare the analysis prompt
+            analysis_prompt = self.risk_prompt.format(contract_text=contract_text)
+            
+            # Get analysis from GPT
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a legal expert specializing in contract risk analysis."},
+                    {"role": "user", "content": analysis_prompt}
+                ],
+                temperature=0.7
+            )
+            
+            # Parse the response
+            analysis_text = response.choices[0].message.content
+            
+            # Extract key components using GPT
+            structure_prompt = f"""
+            Based on this analysis, provide a structured JSON with:
+            1. overall_risk_score (number 1-10)
+            2. risk_summary (string)
+            3. clauses (array of objects with 'clause', 'risk_level', and 'details')
+            
+            Analysis:
+            {analysis_text}
+            """
+            
+            structure_response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a JSON formatter for legal analysis."},
+                    {"role": "user", "content": structure_prompt}
+                ],
+                temperature=0
+            )
+            
+            # Parse the structured response
+            import json
+            structured_analysis = json.loads(structure_response.choices[0].message.content)
+            
+            return structured_analysis
+            
+        except Exception as e:
+            print(f"Error in risk analysis: {str(e)}")
+            raise Exception(f"Failed to analyze risks: {str(e)}")
 
 # Risk Assessment Routes
 @app.route('/api/analyze/risks', methods=['POST'])

@@ -1,5 +1,5 @@
-// React Components
 const e = React.createElement;
+// React Components
 
 // API Configuration
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -415,28 +415,40 @@ function App() {
         }
     };
 
-    // Function to handle risk analysis
+    // Handle risk analysis
     const handleRiskAnalysis = async () => {
+        if (!contract) {
+            setError('Please upload or paste a contract first');
+            return;
+        }
+
         try {
             const response = await fetch(`${API_BASE_URL}/api/analyze/risks`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ content: contractText })
+                body: JSON.stringify({
+                    content: contract
+                })
             });
 
             if (!response.ok) {
-                throw new Error('Risk analysis failed');
+                throw new Error('Failed to analyze risks');
             }
 
-            const analysis = await response.json();
-            setRiskAnalysis(analysis);
+            const result = await response.json();
+            setRiskAnalysis(result);
             setShowRiskAnalysis(true);
+            setError(null);
         } catch (error) {
-            console.error('Error analyzing risks:', error);
-            alert('Failed to analyze risks. Please try again.');
+            console.error('Risk analysis error:', error);
+            setError(error.message);
         }
+    };
+
+    const handleCloseRiskAnalysis = () => {
+        setShowRiskAnalysis(false);
     };
 
     // Render analysis section
@@ -759,87 +771,67 @@ function App() {
 
     // Risk Analysis Modal Component
     function RiskAnalysisModal({ isOpen, onClose, analysis }) {
-        if (!isOpen) return null;
+        if (!isOpen || !analysis) return null;
 
         const getRiskColor = (level) => {
-            const colors = {
-                high: '#ffebee',
-                medium: '#fff3e0',
-                low: '#e8f5e9'
-            };
-            return colors[level] || '#ffffff';
+            switch(level.toLowerCase()) {
+                case 'high':
+                    return 'bg-red-100 text-red-800 border-red-200';
+                case 'medium':
+                    return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                case 'low':
+                    return 'bg-green-100 text-green-800 border-green-200';
+                default:
+                    return 'bg-gray-100 text-gray-800 border-gray-200';
+            }
+        };
+
+        const getRiskScoreColor = (score) => {
+            if (score >= 7) return 'bg-red-500';
+            if (score >= 4) return 'bg-yellow-500';
+            return 'bg-green-500';
         };
 
         return e('div', {
-            className: 'modal show d-block',
-            tabIndex: '-1'
+            className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'
         },
-            e('div', { className: 'modal-dialog modal-lg' },
-                e('div', { className: 'modal-content' },
-                    e('div', { className: 'modal-header' },
-                        e('h5', { className: 'modal-title' }, '📊 Risk Analysis Report'),
-                        e('button', {
-                            type: 'button',
-                            className: 'btn-close',
-                            onClick: onClose
-                        })
+            e('div', {
+                className: 'bg-white rounded-lg w-3/4 max-h-[90vh] overflow-y-auto p-6'
+            },
+                e('div', { className: 'flex justify-between items-center mb-6' },
+                    e('h2', { className: 'text-2xl font-bold' }, '📊 Risk Analysis Report'),
+                    e('button', {
+                        onClick: onClose,
+                        className: 'text-gray-500 hover:text-gray-700'
+                    }, '✕')
+                ),
+                e('div', { className: 'space-y-6' },
+                    // Overall Risk Score
+                    e('div', { className: 'mb-6' },
+                        e('div', { className: 'flex items-center gap-4' },
+                            e('h3', { className: 'text-xl font-semibold' }, 'Overall Risk Score:'),
+                            e('span', {
+                                className: `px-3 py-1 rounded-full text-white font-bold ${getRiskScoreColor(analysis.overall_risk_score)}`
+                            }, `${analysis.overall_risk_score}/10`)
+                        ),
+                        e('p', { className: 'mt-2 text-gray-700' }, analysis.risk_summary)
                     ),
-                    e('div', { className: 'modal-body' },
-                        e('div', { className: 'mb-4' },
-                            e('h6', { className: 'fw-bold' }, 'Overall Risk Score: ',
-                                e('span', {
-                                    className: `badge ${analysis.overall_risk_score > 7 ? 'bg-danger' : analysis.overall_risk_score > 4 ? 'bg-warning' : 'bg-success'}`
-                                }, `${analysis.overall_risk_score}/10`)
-                            ),
-                            e('p', { className: 'mt-2' }, analysis.risk_summary)
-                        ),
-                        e('div', { className: 'mb-4' },
-                            e('h6', { className: 'fw-bold' }, 'Clause Analysis'),
-                            e('div', { className: 'list-group' },
-                                analysis.clauses.map((clause, index) =>
-                                    e('div', {
-                                        key: index,
-                                        className: 'list-group-item',
-                                        style: { backgroundColor: getRiskColor(clause.risk_level) }
-                                    },
-                                        e('h6', { className: 'mb-2' }, `Risk Level: `,
-                                            e('span', {
-                                                className: `badge ${clause.risk_level === 'high' ? 'bg-danger' : clause.risk_level === 'medium' ? 'bg-warning' : 'bg-success'}`
-                                            }, clause.risk_level.toUpperCase())
-                                        ),
-                                        e('div', { className: 'mb-2' },
-                                            e('strong', {}, 'Clause: '),
-                                            clause.text
-                                        ),
-                                        e('div', { className: 'mb-2' },
-                                            e('strong', {}, 'Risk Factors:'),
-                                            e('ul', {},
-                                                clause.risk_factors.map((factor, i) =>
-                                                    e('li', { key: i }, factor)
-                                                )
-                                            )
-                                        ),
-                                        e('div', { className: 'mb-2' },
-                                            e('strong', {}, 'Suggestions:'),
-                                            e('ul', {},
-                                                clause.suggestions.map((suggestion, i) =>
-                                                    e('li', { key: i }, suggestion)
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-                        e('div', { className: 'mb-4' },
-                            e('h6', { className: 'fw-bold' }, 'Key Concerns'),
-                            e('ul', { className: 'list-group' },
-                                analysis.key_concerns.map((concern, index) =>
-                                    e('li', {
-                                        key: index,
-                                        className: 'list-group-item list-group-item-warning'
-                                    }, concern)
-                                )
+                    
+                    // Clause Analysis
+                    e('div', { className: 'space-y-4' },
+                        e('h3', { className: 'text-xl font-semibold mb-4' }, 'Clause Analysis'),
+                        ...analysis.clauses.map((clause, index) =>
+                            e('div', {
+                                key: index,
+                                className: `p-4 rounded-lg border ${getRiskColor(clause.risk_level)}`
+                            },
+                                e('div', { className: 'flex justify-between items-start mb-2' },
+                                    e('h4', { className: 'font-semibold' }, clause.clause),
+                                    e('span', {
+                                        className: `px-2 py-1 rounded-md text-sm font-medium ${getRiskColor(clause.risk_level)}`
+                                    }, clause.risk_level.toUpperCase())
+                                ),
+                                e('p', { className: 'text-sm' }, clause.details)
                             )
                         )
                     )
@@ -1063,10 +1055,10 @@ function App() {
                 disabled: !contract || isAnalyzing
             }, isAnalyzing ? 'Analyzing...' : 'Analyze Contract'),
             e('button', {
-                className: 'px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700',
+                className: 'px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50',
                 onClick: handleRiskAnalysis,
                 disabled: !contract || isAnalyzing
-            }, '🔍 Risk Analysis'),
+            }, '🔍 Analyze Risks'),
             e('button', {
                 className: 'px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700',
                 onClick: () => setShowRewritePrompt(true),
@@ -1234,7 +1226,7 @@ function App() {
         renderRewritePrompt(),
         showRiskAnalysis && e(RiskAnalysisModal, {
             isOpen: showRiskAnalysis,
-            onClose: () => setShowRiskAnalysis(false),
+            onClose: handleCloseRiskAnalysis,
             analysis: riskAnalysis
         })
     );
