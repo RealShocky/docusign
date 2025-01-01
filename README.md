@@ -29,6 +29,21 @@ A revolutionary AI-powered contract management system that transforms the way or
 
 ## Quick Start
 
+## Important Configuration Notes
+
+Before running the application, you'll need to update the server URLs in three files: They are currently set to my test for the hackathon.
+
+1. app.py (line 77):
+CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5000"}})
+
+2. static/js/app.js (line 7):
+const API_BASE_URL = 'http://127.0.0.1:5000';
+
+3. static/js/config.js (line 7):
+export const SERVER_URL = 'http://127.0.0.1:5000';
+
+Update these URLs to match your server configuration. For local development, use 127.0.0.1:5000 or your preferred local server address.
+
 ### Prerequisites
 - Python 3.8+
 - DocuSign Developer Account
