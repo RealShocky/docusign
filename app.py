@@ -63,8 +63,8 @@ print("FLASK_ENV:", os.getenv('FLASK_ENV', 'Not found'))
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app, resources={
-    r"/api/*": {
-        "origins": ["http://localhost", "https://vibrationrobotics.com", "http://vibrationrobotics.com"],
+    r"/*": {
+        "origins": ["http://localhost:5000", "http://localhost", "https://vibrationrobotics.com", "http://vibrationrobotics.com"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }

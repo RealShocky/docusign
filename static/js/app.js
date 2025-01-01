@@ -2,9 +2,9 @@
 const e = React.createElement;
 
 // API Configuration
-const API_BASE_URL = window.location.protocol === 'https:' 
-    ? 'https://vibrationrobotics.com:5000'
-    : 'http://localhost:5000';
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5000'
+    : 'https://vibrationrobotics.com/docusign';
 
 // Contract Templates Data with actual content
 const contractTemplates = [
