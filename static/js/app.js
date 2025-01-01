@@ -4,7 +4,7 @@ const e = React.createElement;
 // API Configuration
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:5000'
-    : 'https://vibrationrobotics.com/docusign';
+    : 'http://vibrationrobotics.com/docusign';
 
 // Contract Templates Data with actual content
 const contractTemplates = [
@@ -210,6 +210,10 @@ function App() {
     const [isAnalyzingPositions, setIsAnalyzingPositions] = React.useState(false);
     const [showPositionSelector, setShowPositionSelector] = React.useState(false);
 
+    // Add state for risk analysis
+    const [showRiskAnalysis, setShowRiskAnalysis] = React.useState(false);
+    const [riskAnalysis, setRiskAnalysis] = React.useState(null);
+
     // Error Boundary
     React.useEffect(() => {
         window.onerror = (msg, url, lineNo, columnNo, error) => {
@@ -408,6 +412,30 @@ function App() {
                 type: 'error',
                 message: 'Failed to send contract: ' + err.message
             });
+        }
+    };
+
+    // Function to handle risk analysis
+    const handleRiskAnalysis = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/analyze/risks`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: contractText })
+            });
+
+            if (!response.ok) {
+                throw new Error('Risk analysis failed');
+            }
+
+            const analysis = await response.json();
+            setRiskAnalysis(analysis);
+            setShowRiskAnalysis(true);
+        } catch (error) {
+            console.error('Error analyzing risks:', error);
+            alert('Failed to analyze risks. Please try again.');
         }
     };
 
@@ -720,6 +748,136 @@ function App() {
         setSigners(newSigners);
     };
 
+    // Risk Analysis Button Component
+    function RiskAnalysisButton({ onAnalyze }) {
+        return e('button', {
+            className: 'btn btn-warning ms-2',
+            onClick: onAnalyze,
+            title: 'Analyze contract risks'
+        }, '🔍 Risk Analysis');
+    }
+
+    // Risk Analysis Modal Component
+    function RiskAnalysisModal({ isOpen, onClose, analysis }) {
+        if (!isOpen) return null;
+
+        const getRiskColor = (level) => {
+            const colors = {
+                high: '#ffebee',
+                medium: '#fff3e0',
+                low: '#e8f5e9'
+            };
+            return colors[level] || '#ffffff';
+        };
+
+        return e('div', {
+            className: 'modal show d-block',
+            tabIndex: '-1'
+        },
+            e('div', { className: 'modal-dialog modal-lg' },
+                e('div', { className: 'modal-content' },
+                    e('div', { className: 'modal-header' },
+                        e('h5', { className: 'modal-title' }, '📊 Risk Analysis Report'),
+                        e('button', {
+                            type: 'button',
+                            className: 'btn-close',
+                            onClick: onClose
+                        })
+                    ),
+                    e('div', { className: 'modal-body' },
+                        e('div', { className: 'mb-4' },
+                            e('h6', { className: 'fw-bold' }, 'Overall Risk Score: ',
+                                e('span', {
+                                    className: `badge ${analysis.overall_risk_score > 7 ? 'bg-danger' : analysis.overall_risk_score > 4 ? 'bg-warning' : 'bg-success'}`
+                                }, `${analysis.overall_risk_score}/10`)
+                            ),
+                            e('p', { className: 'mt-2' }, analysis.risk_summary)
+                        ),
+                        e('div', { className: 'mb-4' },
+                            e('h6', { className: 'fw-bold' }, 'Clause Analysis'),
+                            e('div', { className: 'list-group' },
+                                analysis.clauses.map((clause, index) =>
+                                    e('div', {
+                                        key: index,
+                                        className: 'list-group-item',
+                                        style: { backgroundColor: getRiskColor(clause.risk_level) }
+                                    },
+                                        e('h6', { className: 'mb-2' }, `Risk Level: `,
+                                            e('span', {
+                                                className: `badge ${clause.risk_level === 'high' ? 'bg-danger' : clause.risk_level === 'medium' ? 'bg-warning' : 'bg-success'}`
+                                            }, clause.risk_level.toUpperCase())
+                                        ),
+                                        e('div', { className: 'mb-2' },
+                                            e('strong', {}, 'Clause: '),
+                                            clause.text
+                                        ),
+                                        e('div', { className: 'mb-2' },
+                                            e('strong', {}, 'Risk Factors:'),
+                                            e('ul', {},
+                                                clause.risk_factors.map((factor, i) =>
+                                                    e('li', { key: i }, factor)
+                                                )
+                                            )
+                                        ),
+                                        e('div', { className: 'mb-2' },
+                                            e('strong', {}, 'Suggestions:'),
+                                            e('ul', {},
+                                                clause.suggestions.map((suggestion, i) =>
+                                                    e('li', { key: i }, suggestion)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        e('div', { className: 'mb-4' },
+                            e('h6', { className: 'fw-bold' }, 'Key Concerns'),
+                            e('ul', { className: 'list-group' },
+                                analysis.key_concerns.map((concern, index) =>
+                                    e('li', {
+                                        key: index,
+                                        className: 'list-group-item list-group-item-warning'
+                                    }, concern)
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    }
+
+    const renderPositionSelector = () => {
+        if (!showPositionSelector) return null;
+        
+        return e('div', { className: 'position-selector' },
+            e('h3', null, 'Select Signature Positions'),
+            signers.map((signer, index) => 
+                e('div', { key: index, className: 'signer-position' },
+                    e('h4', null, signer.name || `Signer ${index + 1}`),
+                    signaturePositions[index] && e('div', { className: 'position-info' },
+                        e('p', null, 
+                            e('strong', null, 'Description:'), 
+                            ' ', 
+                            signaturePositions[index].description
+                        ),
+                        e('p', null, 
+                            e('strong', null, 'Location:'), 
+                            ' ', 
+                            signaturePositions[index].anchor_text
+                        ),
+                        e('p', null, 
+                            e('strong', null, 'Alignment:'), 
+                            ' ', 
+                            signaturePositions[index].align
+                        )
+                    )
+                )
+            )
+        );
+    };
+
     const renderRewritePrompt = () => {
         if (!showRewritePrompt) return null;
 
@@ -738,7 +896,7 @@ function App() {
                     'Enter your instructions for rewriting the contract. Be specific about what changes you want to make.'
                 ),
                 e('textarea', {
-                    className: 'w-full p-3 border rounded-lg mb-4 h-32',
+                    className: 'w-full h-32 p-3 border rounded-lg mb-4',
                     placeholder: 'Example: Make the language more formal and add a confidentiality clause',
                     value: rewritePrompt,
                     onChange: (e) => setRewritePrompt(e.target.value)
@@ -863,48 +1021,63 @@ function App() {
         );
     };
 
-    const renderPositionSelector = () => {
-        if (!showPositionSelector) return null;
-        
-        return (
-            <div className="position-selector">
-                <h3>Select Signature Positions</h3>
-                {signers.map((signer, index) => (
-                    <div key={index} className="signer-position">
-                        <h4>{signer.name || `Signer ${index + 1}`}</h4>
-                        {signaturePositions[index] && (
-                            <div className="position-info">
-                                <p><strong>Description:</strong> {signaturePositions[index].description}</p>
-                                <p><strong>Location:</strong> {signaturePositions[index].anchor_text}</p>
-                                <p><strong>Alignment:</strong> {signaturePositions[index].align}</p>
-                            </div>
-                        )}
-                    </div>
-                ))}
-                <button 
-                    onClick={analyzeSignaturePositions}
-                    disabled={isAnalyzingPositions || !contract}
-                >
-                    {isAnalyzingPositions ? 'Analyzing...' : 'Analyze Signature Positions'}
-                </button>
-            </div>
+    const Header = () => {
+        return e('div', { className: 'mb-8' },
+            e('div', { className: 'bg-blue-600 text-white p-4 text-center' },
+                e('h1', { className: 'text-2xl font-bold' }, 'ContractIQ'),
+                e('p', { className: 'text-sm mt-1' }, 'AI-Powered Contract Management')
+            ),
+            e('nav', { className: 'bg-white border-b' },
+                e('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8' },
+                    e('div', { className: 'flex justify-between h-16' },
+                        e('div', { className: 'flex' },
+                            e('div', { className: 'flex-shrink-0 flex items-center' },
+                                e('img', {
+                                    className: 'h-8 w-auto',
+                                    src: '/static/img/logo.png',
+                                    alt: 'ContractIQ'
+                                })
+                            )
+                        ),
+                        e('div', { className: 'flex items-center' },
+                            e('button', {
+                                className: 'p-2 text-gray-600 hover:text-gray-800',
+                                onClick: () => setShowHelp(true)
+                            }, '?'),
+                            e('button', {
+                                className: 'p-2 ml-2 text-gray-600 hover:text-gray-800',
+                                onClick: () => setShowSettings(true)
+                            }, '⚙️')
+                        )
+                    )
+                )
+            )
         );
     };
 
-    const Header = () => {
-        return (
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to ContractIQ</h1>
-                <p className="text-gray-600">Streamline your contract management with AI-powered insights and DocuSign integration.</p>
-            </div>
+    const renderContractActions = () => {
+        return e('div', { className: 'flex flex-wrap gap-2 mt-4' },
+            e('button', {
+                className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700',
+                onClick: handleAnalyze,
+                disabled: !contract || isAnalyzing
+            }, isAnalyzing ? 'Analyzing...' : 'Analyze Contract'),
+            e('button', {
+                className: 'px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700',
+                onClick: handleRiskAnalysis,
+                disabled: !contract || isAnalyzing
+            }, '🔍 Risk Analysis'),
+            e('button', {
+                className: 'px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700',
+                onClick: () => setShowRewritePrompt(true),
+                disabled: !contract
+            }, '✏️ Rewrite')
         );
     };
 
     return e('div', { className: 'min-h-screen bg-gray-50' },
         // Header
-        e('div', { className: 'bg-blue-600 text-white p-4 text-center' },
-            e('h1', { className: 'text-2xl font-bold' }, 'ContractIQ')
-        ),
+        e(Header),
         // Progress Steps
         renderNavigation(),
         // Main Content
@@ -917,52 +1090,104 @@ function App() {
             // Middle Column - Document Upload and Analysis
             e('div', { className: 'lg:col-span-1' },
                 e('div', { className: 'bg-white p-6 rounded-xl shadow-md' },
+                    // Document Upload Section
                     e('h2', { className: 'text-xl font-semibold mb-4' }, 'Document Upload'),
-                    e('div', {
+                    uploadedFile && e('div', { className: 'mb-4 text-green-600' },
+                        'File loaded: ', uploadedFile
+                    ),
+                    
+                    // Contract Actions (after file upload)
+                    contract && e('div', { className: 'flex gap-2 mb-4 mt-4' },
+                        e('button', {
+                            className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700',
+                            onClick: () => handleAnalyze(contract),
+                            disabled: isAnalyzing
+                        }, isAnalyzing ? 'Analyzing...' : 'Analyze Contract'),
+                        e('button', {
+                            className: 'px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700',
+                            onClick: handleRiskAnalysis,
+                            disabled: isAnalyzing
+                        }, '🔍 Risk Analysis'),
+                        e('button', {
+                            className: 'px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700',
+                            onClick: () => setShowRewritePrompt(true)
+                        }, '✏️ Rewrite')
+                    ),
+
+                    // Upload Area
+                    !uploadedFile && e('div', {
                         className: `upload-area rounded-lg p-8 text-center ${dragActive ? 'drag-active' : ''}`,
                         onDragEnter: handleDrag,
                         onDragLeave: handleDrag,
                         onDragOver: handleDrag,
                         onDrop: handleDrop
                     },
-                        !uploadedFile ? [
-                            e('div', { key: 'upload-prompt' },
-                                e('p', { className: 'text-gray-600 mb-4' },
-                                    'Drag and drop your document here, or ',
-                                    e('button', {
-                                        className: 'text-blue-600 hover:text-blue-700',
-                                        onClick: () => fileInputRef.current.click()
-                                    }, 'browse'),
-                                    ' to upload'
-                                ),
-                                e('input', {
-                                    type: 'file',
-                                    ref: fileInputRef,
-                                    onChange: handleFileUpload,
-                                    className: 'hidden'
-                                })
+                        e('div', { key: 'upload-prompt' },
+                            e('p', { className: 'text-gray-600 mb-4' },
+                                'Drag and drop your document here, or ',
+                                e('button', {
+                                    className: 'text-blue-600 hover:text-blue-700',
+                                    onClick: () => fileInputRef.current.click()
+                                }, 'browse'),
+                                ' to upload'
                             ),
-                            e('div', { key: 'divider', className: 'my-4 flex items-center justify-center' },
-                                e('span', { className: 'text-gray-400' }, 'or')
+                            e('input', {
+                                type: 'file',
+                                ref: fileInputRef,
+                                onChange: handleFileUpload,
+                                className: 'hidden'
+                            })
+                        ),
+                        e('div', { key: 'divider', className: 'my-4 flex items-center justify-center' },
+                            e('span', { className: 'text-gray-400' }, 'or')
+                        ),
+                        e('button', {
+                            key: 'paste-button',
+                            className: 'flex items-center justify-center mx-auto text-gray-600 hover:text-gray-700',
+                            onClick: handlePaste
+                        },
+                            e('svg', { className: 'w-5 h-5 mr-2', fill: 'currentColor', viewBox: '0 0 20 20' },
+                                e('path', { d: 'M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z' }),
+                                e('path', { d: 'M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z' })
                             ),
-                            e('button', {
-                                key: 'paste-button',
-                                className: 'flex items-center justify-center mx-auto text-gray-600 hover:text-gray-700',
-                                onClick: handlePaste
-                            },
-                                e('svg', { className: 'w-5 h-5 mr-2', fill: 'currentColor', viewBox: '0 0 20 20' },
-                                    e('path', { d: 'M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z' }),
-                                    e('path', { d: 'M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z' })
-                                ),
-                                'Paste Content'
-                            )
-                        ] : e('div', { className: 'text-green-600' },
-                            `File loaded: ${uploadedFile}`
+                            'Paste Content'
                         )
                     )
                 ),
 
-                renderAnalysis()
+                contract && e('div', { className: 'bg-blue-50 p-6 rounded-xl mb-6' },
+                    e('div', { className: 'flex items-center justify-between mb-4' },
+                        e('div', { className: 'flex items-center gap-3' },
+                            e('img', {
+                                src: '/static/img/robot.png',
+                                alt: 'AI',
+                                className: 'w-8 h-8'
+                            }),
+                            e('div', null,
+                                e('h3', { className: 'text-lg font-semibold' }, 'AI Analysis'),
+                                e('p', { className: 'text-sm text-gray-600' }, 'Powered by GPT-4')
+                            )
+                        ),
+                        e('div', { className: 'flex gap-2' },
+                            e('button', {
+                                className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700',
+                                onClick: () => handleAnalyze(contract),
+                                disabled: isAnalyzing
+                            }, isAnalyzing ? 'Analyzing...' : 'Analyze Contract'),
+                            e('button', {
+                                className: 'px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700',
+                                onClick: handleRiskAnalysis,
+                                disabled: isAnalyzing
+                            }, '🔍 Risk Analysis'),
+                            e('button', {
+                                className: 'px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700',
+                                onClick: () => setShowRewritePrompt(true)
+                            }, '✏️ Rewrite')
+                        )
+                    ),
+                    analysis && e('div', { className: 'mt-4' }, renderAnalysis())
+                ),
+                renderContractActions(),
             ),
 
             // Right Column - Contract Preview and Signers
@@ -1044,7 +1269,12 @@ function App() {
             )
         ),
 
-        renderRewritePrompt()
+        renderRewritePrompt(),
+        showRiskAnalysis && e(RiskAnalysisModal, {
+            isOpen: showRiskAnalysis,
+            onClose: () => setShowRiskAnalysis(false),
+            analysis: riskAnalysis
+        })
     );
 }
 

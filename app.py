@@ -75,8 +75,7 @@ CORS(app, resources={
 
 # Session configuration
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-here')
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config['SESSION_FILE_DIR'] = tempfile.gettempdir()
+app.config['SESSION_TYPE'] = 'null'  # Use memory-based sessions instead of filesystem
 Session(app)
 
 # Initialize database
@@ -899,6 +898,21 @@ Document Signing System"""
     except Exception as e:
         print(f"Failed to send email to {recipient_email}: {str(e)}")
         return False
+
+# Risk Assessment Routes
+@app.route('/api/analyze/risks', methods=['POST'])
+def analyze_risks():
+    if not request.json or 'content' not in request.json:
+        return jsonify({"error": "No contract text provided"}), 400
+    
+    try:
+        contract_text = request.json['content']
+        risk_service = RiskService()
+        analysis = risk_service.analyze_contract_risks(contract_text)
+        return jsonify(analysis)
+    except Exception as e:
+        print(f"Error in risk analysis endpoint: {str(e)}")
+        return jsonify({"error": f"Risk analysis failed: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

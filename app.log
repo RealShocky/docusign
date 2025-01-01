@@ -1,0 +1,232 @@
+2024-12-31 20:11:10,139 - werkzeug - WARNING -  * Debugger is active!
+2024-12-31 20:11:10,198 - werkzeug - INFO -  * Debugger PIN: 641-015-369
+2024-12-31 20:11:14,962 - __main__ - INFO - Headers: Host: localhost:5000
+Connection: keep-alive
+Sec-Ch-Ua-Platform: "Windows"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+Sec-Ch-Ua: "Brave";v="131", "Chromium";v="131", "Not_A Brand";v="24"
+Dnt: 1
+Sec-Ch-Ua-Mobile: ?0
+Accept: */*
+Sec-Gpc: 1
+Origin: http://vibrationrobotics.com
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://vibrationrobotics.com/
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+
+
+2024-12-31 20:11:14,966 - __main__ - INFO - Body: b''
+2024-12-31 20:11:14,969 - __main__ - INFO - Response: b'[\n  {\n    "content": "[Your Company Name]\\nMUTUAL NON-DISCLOSURE AGREEMENT\\n\\nThis Mutual Non-Disclosure Agreement (this \\"Agreement\\") is made and entered into as of [Date], by and between [Your Company Name], located at [Your Address] and [Other Party Name], located at [Other Party Address].\\n\\n1. Definition of Confidential Information...",\n    "description": "A comprehensive NDA for protecting confidential information",\n    "id": "nda",\n    "name": "Non-Disclosure Agreement (NDA)"\n  },\n  {\n    "content": "SERVICE AGREEMENT\\n\\nThis Service Agreement (the \\"Agreement\\") is made and entered into as of [Date], by and between:\\n\\nProvider: [Provider Name], located at [Provider Address]\\nClient: [Client Name], located at [Client Address]\\n\\n1. Services...",\n    "description": "A detailed contract for service providers and clients",\n    "id": "service",\n    "name": "Service Agreement"\n  },\n  {\n    "content": "EMPLOYMENT AGREEMENT\\n\\nThis Employment Agreement (the \\"Agreement\\") is made and entered into as of [Date], by and between:\\n\\nEmployer: [Company Name], located at [Company Address]\\nEmployee: [Employee Name], residing at [Employee Address]\\n\\n1. Position and Duties...",\n    "description": "A comprehensive employment agreement template",\n    "id": "employment",\n    "name": "Employment Contract"\n  }\n]\n'
+2024-12-31 20:11:14,981 - werkzeug - INFO - 127.0.0.1 - - [31/Dec/2024 20:11:14] "GET /api/templates HTTP/1.1" 200 -
+2024-12-31 20:11:24,400 - __main__ - INFO - Headers: Host: localhost:5000
+Connection: keep-alive
+Accept: */*
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type
+Origin: http://vibrationrobotics.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Dest: empty
+Referer: http://vibrationrobotics.com/
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+
+
+2024-12-31 20:11:24,404 - __main__ - INFO - Body: b''
+2024-12-31 20:11:24,424 - __main__ - INFO - Response: b''
+2024-12-31 20:11:24,430 - werkzeug - INFO - 127.0.0.1 - - [31/Dec/2024 20:11:24] "OPTIONS /api/analyze HTTP/1.1" 200 -
+2024-12-31 20:11:24,736 - __main__ - INFO - Headers: Host: localhost:5000
+Connection: keep-alive
+Accept: */*
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type
+Origin: http://vibrationrobotics.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Dest: empty
+Referer: http://vibrationrobotics.com/
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+
+
+2024-12-31 20:11:24,737 - __main__ - INFO - Body: b''
+2024-12-31 20:11:24,737 - __main__ - INFO - Response: b''
+2024-12-31 20:11:24,740 - werkzeug - INFO - 127.0.0.1 - - [31/Dec/2024 20:11:24] "OPTIONS /api/analyze HTTP/1.1" 200 -
+2024-12-31 20:11:24,759 - __main__ - INFO - Headers: Host: localhost:5000
+Connection: keep-alive
+Content-Length: 983
+Sec-Ch-Ua-Platform: "Windows"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+Sec-Ch-Ua: "Brave";v="131", "Chromium";v="131", "Not_A Brand";v="24"
+Dnt: 1
+Content-Type: application/json
+Sec-Ch-Ua-Mobile: ?0
+Accept: */*
+Sec-Gpc: 1
+Origin: http://vibrationrobotics.com
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://vibrationrobotics.com/
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+
+
+2024-12-31 20:11:24,761 - __main__ - INFO - Body: b'{"content":"SERVICE AGREEMENT\\n\\nThis Service Agreement (the \\"Agreement\\") is entered into as of [DATE] by and between:\\n\\n[SERVICE PROVIDER NAME] (\\"Provider\\")\\nand\\n[CLIENT NAME] (\\"Client\\")\\n\\n1. Services\\nProvider agrees to provide the following services to Client: [DESCRIPTION OF SERVICES]\\n\\n2. Compensation\\nClient agrees to compensate Provider as follows: [PAYMENT TERMS]\\n\\n3. Term\\nThis Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.\\n\\n4. Independent Contractor\\nProvider is an independent contractor, and nothing in this Agreement shall create an employer-employee relationship.\\n\\n5. Confidentiality\\nBoth parties agree to maintain the confidentiality of any proprietary information shared during the course of this Agreement.\\n\\nIN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.\\n\\n[SERVICE PROVIDER]\\nBy: ____________________\\n\\n[CLIENT]\\nBy: ____________________"}'
+2024-12-31 20:11:24,876 - openai - DEBUG - message='Request to OpenAI API' method=post path=https://api.openai.com/v1/chat/completions
+2024-12-31 20:11:24,877 - openai - DEBUG - api_version=None data='{"model": "gpt-4-1106-preview", "messages": [{"role": "system", "content": "You are a legal contract analysis assistant. Analyze the contract and provide a detailed analysis in the following format:\\n\\n## Summary\\n[Provide a clear, concise summary of the contract\'s purpose and main points in a professional tone]\\n\\n## Key Points\\n[List each key point with proper markdown formatting. Use bold for headers and explain each point clearly]\\n\\n1. **Parties Involved**: [Details]\\n2. **Purpose**: [Details]\\n3. **Terms**: [Details]\\n[Continue with other relevant points...]\\n\\n## Suggestions for Improvement\\n[Provide specific, actionable suggestions in a clear format]\\n\\n1. **[Suggestion Title]**: [Detailed explanation]\\n2. **[Suggestion Title]**: [Detailed explanation]\\n[Continue with other suggestions...]\\n\\nNote: Use proper markdown formatting:\\n- Bold (**) for important terms\\n- Lists for better readability\\n- Clear section breaks\\n- Professional tone throughout"}, {"role": "user", "content": "Please analyze this contract:\\n\\nSERVICE AGREEMENT\\n\\nThis Service Agreement (the \\"Agreement\\") is entered into as of [DATE] by and between:\\n\\n[SERVICE PROVIDER NAME] (\\"Provider\\")\\nand\\n[CLIENT NAME] (\\"Client\\")\\n\\n1. Services\\nProvider agrees to provide the following services to Client: [DESCRIPTION OF SERVICES]\\n\\n2. Compensation\\nClient agrees to compensate Provider as follows: [PAYMENT TERMS]\\n\\n3. Term\\nThis Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.\\n\\n4. Independent Contractor\\nProvider is an independent contractor, and nothing in this Agreement shall create an employer-employee relationship.\\n\\n5. Confidentiality\\nBoth parties agree to maintain the confidentiality of any proprietary information shared during the course of this Agreement.\\n\\nIN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.\\n\\n[SERVICE PROVIDER]\\nBy: ____________________\\n\\n[CLIENT]\\nBy: ____________________"}], "temperature": 0.7}' message='Post details'
+2024-12-31 20:11:25,060 - __main__ - INFO - Headers: Host: localhost:5000
+Connection: keep-alive
+Content-Length: 983
+Sec-Ch-Ua-Platform: "Windows"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+Sec-Ch-Ua: "Brave";v="131", "Chromium";v="131", "Not_A Brand";v="24"
+Dnt: 1
+Content-Type: application/json
+Sec-Ch-Ua-Mobile: ?0
+Accept: */*
+Sec-Gpc: 1
+Origin: http://vibrationrobotics.com
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://vibrationrobotics.com/
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+
+
+2024-12-31 20:11:25,062 - __main__ - INFO - Body: b'{"content":"SERVICE AGREEMENT\\n\\nThis Service Agreement (the \\"Agreement\\") is entered into as of [DATE] by and between:\\n\\n[SERVICE PROVIDER NAME] (\\"Provider\\")\\nand\\n[CLIENT NAME] (\\"Client\\")\\n\\n1. Services\\nProvider agrees to provide the following services to Client: [DESCRIPTION OF SERVICES]\\n\\n2. Compensation\\nClient agrees to compensate Provider as follows: [PAYMENT TERMS]\\n\\n3. Term\\nThis Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.\\n\\n4. Independent Contractor\\nProvider is an independent contractor, and nothing in this Agreement shall create an employer-employee relationship.\\n\\n5. Confidentiality\\nBoth parties agree to maintain the confidentiality of any proprietary information shared during the course of this Agreement.\\n\\nIN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.\\n\\n[SERVICE PROVIDER]\\nBy: ____________________\\n\\n[CLIENT]\\nBy: ____________________"}'
+2024-12-31 20:11:25,067 - openai - DEBUG - message='Request to OpenAI API' method=post path=https://api.openai.com/v1/chat/completions
+2024-12-31 20:11:25,067 - openai - DEBUG - api_version=None data='{"model": "gpt-4-1106-preview", "messages": [{"role": "system", "content": "You are a legal contract analysis assistant. Analyze the contract and provide a detailed analysis in the following format:\\n\\n## Summary\\n[Provide a clear, concise summary of the contract\'s purpose and main points in a professional tone]\\n\\n## Key Points\\n[List each key point with proper markdown formatting. Use bold for headers and explain each point clearly]\\n\\n1. **Parties Involved**: [Details]\\n2. **Purpose**: [Details]\\n3. **Terms**: [Details]\\n[Continue with other relevant points...]\\n\\n## Suggestions for Improvement\\n[Provide specific, actionable suggestions in a clear format]\\n\\n1. **[Suggestion Title]**: [Detailed explanation]\\n2. **[Suggestion Title]**: [Detailed explanation]\\n[Continue with other suggestions...]\\n\\nNote: Use proper markdown formatting:\\n- Bold (**) for important terms\\n- Lists for better readability\\n- Clear section breaks\\n- Professional tone throughout"}, {"role": "user", "content": "Please analyze this contract:\\n\\nSERVICE AGREEMENT\\n\\nThis Service Agreement (the \\"Agreement\\") is entered into as of [DATE] by and between:\\n\\n[SERVICE PROVIDER NAME] (\\"Provider\\")\\nand\\n[CLIENT NAME] (\\"Client\\")\\n\\n1. Services\\nProvider agrees to provide the following services to Client: [DESCRIPTION OF SERVICES]\\n\\n2. Compensation\\nClient agrees to compensate Provider as follows: [PAYMENT TERMS]\\n\\n3. Term\\nThis Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.\\n\\n4. Independent Contractor\\nProvider is an independent contractor, and nothing in this Agreement shall create an employer-employee relationship.\\n\\n5. Confidentiality\\nBoth parties agree to maintain the confidentiality of any proprietary information shared during the course of this Agreement.\\n\\nIN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.\\n\\n[SERVICE PROVIDER]\\nBy: ____________________\\n\\n[CLIENT]\\nBy: ____________________"}], "temperature": 0.7}' message='Post details'
+2024-12-31 20:11:31,338 - werkzeug - INFO -  * Detected change in 'C:\\Users\\markv\\Dropbox\\projects\\docusign\\app.py', reloading
+2024-12-31 20:11:31,355 - werkzeug - INFO -  * Detected change in 'C:\\Users\\markv\\Dropbox\\projects\\docusign\\app.py', reloading
+2024-12-31 20:11:39,228 - werkzeug - WARNING -  * Debugger is active!
+2024-12-31 20:11:39,237 - werkzeug - INFO -  * Debugger PIN: 641-015-369
+2024-12-31 20:11:53,578 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-31 20:11:53,578 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-12-31 20:11:53,585 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2024-12-31 20:11:54,306 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-31 20:11:54,306 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-12-31 20:11:54,316 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2024-12-31 20:11:58,315 - werkzeug - WARNING -  * Debugger is active!
+2024-12-31 20:11:58,318 - werkzeug - INFO -  * Debugger PIN: 641-015-369
+2024-12-31 20:11:59,031 - werkzeug - WARNING -  * Debugger is active!
+2024-12-31 20:11:59,035 - werkzeug - INFO -  * Debugger PIN: 641-015-369
+2024-12-31 20:12:05,056 - __main__ - INFO - Headers: Host: localhost:5000
+Connection: keep-alive
+Sec-Ch-Ua-Platform: "Windows"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+Sec-Ch-Ua: "Brave";v="131", "Chromium";v="131", "Not_A Brand";v="24"
+Dnt: 1
+Sec-Ch-Ua-Mobile: ?0
+Accept: */*
+Sec-Gpc: 1
+Origin: http://vibrationrobotics.com
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://vibrationrobotics.com/
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+
+
+2024-12-31 20:12:05,058 - __main__ - INFO - Body: b''
+2024-12-31 20:12:05,058 - __main__ - INFO - Response: b'[\n  {\n    "content": "[Your Company Name]\\nMUTUAL NON-DISCLOSURE AGREEMENT\\n\\nThis Mutual Non-Disclosure Agreement (this \\"Agreement\\") is made and entered into as of [Date], by and between [Your Company Name], located at [Your Address] and [Other Party Name], located at [Other Party Address].\\n\\n1. Definition of Confidential Information...",\n    "description": "A comprehensive NDA for protecting confidential information",\n    "id": "nda",\n    "name": "Non-Disclosure Agreement (NDA)"\n  },\n  {\n    "content": "SERVICE AGREEMENT\\n\\nThis Service Agreement (the \\"Agreement\\") is made and entered into as of [Date], by and between:\\n\\nProvider: [Provider Name], located at [Provider Address]\\nClient: [Client Name], located at [Client Address]\\n\\n1. Services...",\n    "description": "A detailed contract for service providers and clients",\n    "id": "service",\n    "name": "Service Agreement"\n  },\n  {\n    "content": "EMPLOYMENT AGREEMENT\\n\\nThis Employment Agreement (the \\"Agreement\\") is made and entered into as of [Date], by and between:\\n\\nEmployer: [Company Name], located at [Company Address]\\nEmployee: [Employee Name], residing at [Employee Address]\\n\\n1. Position and Duties...",\n    "description": "A comprehensive employment agreement template",\n    "id": "employment",\n    "name": "Employment Contract"\n  }\n]\n'
+2024-12-31 20:12:05,072 - werkzeug - INFO - 127.0.0.1 - - [31/Dec/2024 20:12:05] "GET /api/templates HTTP/1.1" 200 -
+2024-12-31 20:12:05,839 - __main__ - INFO - Headers: Host: localhost:5000
+Connection: keep-alive
+Accept: */*
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type
+Origin: http://vibrationrobotics.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Dest: empty
+Referer: http://vibrationrobotics.com/
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+
+
+2024-12-31 20:12:05,839 - __main__ - INFO - Body: b''
+2024-12-31 20:12:05,841 - __main__ - INFO - Response: b''
+2024-12-31 20:12:05,853 - werkzeug - INFO - 127.0.0.1 - - [31/Dec/2024 20:12:05] "OPTIONS /api/analyze HTTP/1.1" 200 -
+2024-12-31 20:12:06,159 - __main__ - INFO - Headers: Host: localhost:5000
+Connection: keep-alive
+Content-Length: 983
+Sec-Ch-Ua-Platform: "Windows"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+Sec-Ch-Ua: "Brave";v="131", "Chromium";v="131", "Not_A Brand";v="24"
+Dnt: 1
+Content-Type: application/json
+Sec-Ch-Ua-Mobile: ?0
+Accept: */*
+Sec-Gpc: 1
+Origin: http://vibrationrobotics.com
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://vibrationrobotics.com/
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+
+
+2024-12-31 20:12:06,160 - __main__ - INFO - Body: b'{"content":"SERVICE AGREEMENT\\n\\nThis Service Agreement (the \\"Agreement\\") is entered into as of [DATE] by and between:\\n\\n[SERVICE PROVIDER NAME] (\\"Provider\\")\\nand\\n[CLIENT NAME] (\\"Client\\")\\n\\n1. Services\\nProvider agrees to provide the following services to Client: [DESCRIPTION OF SERVICES]\\n\\n2. Compensation\\nClient agrees to compensate Provider as follows: [PAYMENT TERMS]\\n\\n3. Term\\nThis Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.\\n\\n4. Independent Contractor\\nProvider is an independent contractor, and nothing in this Agreement shall create an employer-employee relationship.\\n\\n5. Confidentiality\\nBoth parties agree to maintain the confidentiality of any proprietary information shared during the course of this Agreement.\\n\\nIN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.\\n\\n[SERVICE PROVIDER]\\nBy: ____________________\\n\\n[CLIENT]\\nBy: ____________________"}'
+2024-12-31 20:12:06,160 - __main__ - INFO - Received analyze contract request
+2024-12-31 20:12:06,160 - __main__ - INFO - Contract text length: 934
+2024-12-31 20:12:06,161 - __main__ - DEBUG - Using OpenAI API Key: sk-proj-ZC...
+2024-12-31 20:12:06,161 - __main__ - INFO - Sending request to OpenAI
+2024-12-31 20:12:06,191 - __main__ - INFO - Headers: Host: localhost:5000
+Connection: keep-alive
+Content-Length: 983
+Sec-Ch-Ua-Platform: "Windows"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+Sec-Ch-Ua: "Brave";v="131", "Chromium";v="131", "Not_A Brand";v="24"
+Dnt: 1
+Content-Type: application/json
+Sec-Ch-Ua-Mobile: ?0
+Accept: */*
+Sec-Gpc: 1
+Origin: http://vibrationrobotics.com
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://vibrationrobotics.com/
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+
+
+2024-12-31 20:12:06,192 - __main__ - INFO - Body: b'{"content":"SERVICE AGREEMENT\\n\\nThis Service Agreement (the \\"Agreement\\") is entered into as of [DATE] by and between:\\n\\n[SERVICE PROVIDER NAME] (\\"Provider\\")\\nand\\n[CLIENT NAME] (\\"Client\\")\\n\\n1. Services\\nProvider agrees to provide the following services to Client: [DESCRIPTION OF SERVICES]\\n\\n2. Compensation\\nClient agrees to compensate Provider as follows: [PAYMENT TERMS]\\n\\n3. Term\\nThis Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.\\n\\n4. Independent Contractor\\nProvider is an independent contractor, and nothing in this Agreement shall create an employer-employee relationship.\\n\\n5. Confidentiality\\nBoth parties agree to maintain the confidentiality of any proprietary information shared during the course of this Agreement.\\n\\nIN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.\\n\\n[SERVICE PROVIDER]\\nBy: ____________________\\n\\n[CLIENT]\\nBy: ____________________"}'
+2024-12-31 20:12:06,193 - __main__ - INFO - Received analyze contract request
+2024-12-31 20:12:06,193 - __main__ - INFO - Contract text length: 934
+2024-12-31 20:12:06,193 - __main__ - DEBUG - Using OpenAI API Key: sk-proj-ZC...
+2024-12-31 20:12:06,194 - __main__ - INFO - Sending request to OpenAI
+2024-12-31 20:12:06,253 - openai - DEBUG - message='Request to OpenAI API' method=post path=https://api.openai.com/v1/chat/completions
+2024-12-31 20:12:06,253 - openai - DEBUG - api_version=None data='{"model": "gpt-4-1106-preview", "messages": [{"role": "system", "content": "You are a legal contract analysis assistant. Analyze the contract and provide a detailed analysis in the following format:\\n\\n## Summary\\n[Provide a clear, concise summary of the contract\'s purpose and main points in a professional tone]\\n\\n## Key Points\\n[List each key point with proper markdown formatting. Use bold for headers and explain each point clearly]\\n\\n1. **Parties Involved**: [Details]\\n2. **Purpose**: [Details]\\n3. **Terms**: [Details]\\n[Continue with other relevant points...]\\n\\n## Suggestions for Improvement\\n[Provide specific, actionable suggestions in a clear format]\\n\\n1. **[Suggestion Title]**: [Detailed explanation]\\n2. **[Suggestion Title]**: [Detailed explanation]\\n[Continue with other suggestions...]\\n\\nNote: Use proper markdown formatting:\\n- Bold (**) for important terms\\n- Lists for better readability\\n- Clear section breaks\\n- Professional tone throughout"}, {"role": "user", "content": "Please analyze this contract:\\n\\nSERVICE AGREEMENT\\n\\nThis Service Agreement (the \\"Agreement\\") is entered into as of [DATE] by and between:\\n\\n[SERVICE PROVIDER NAME] (\\"Provider\\")\\nand\\n[CLIENT NAME] (\\"Client\\")\\n\\n1. Services\\nProvider agrees to provide the following services to Client: [DESCRIPTION OF SERVICES]\\n\\n2. Compensation\\nClient agrees to compensate Provider as follows: [PAYMENT TERMS]\\n\\n3. Term\\nThis Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.\\n\\n4. Independent Contractor\\nProvider is an independent contractor, and nothing in this Agreement shall create an employer-employee relationship.\\n\\n5. Confidentiality\\nBoth parties agree to maintain the confidentiality of any proprietary information shared during the course of this Agreement.\\n\\nIN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.\\n\\n[SERVICE PROVIDER]\\nBy: ____________________\\n\\n[CLIENT]\\nBy: ____________________"}], "temperature": 0.7}' message='Post details'
+2024-12-31 20:12:06,270 - openai - DEBUG - message='Request to OpenAI API' method=post path=https://api.openai.com/v1/chat/completions
+2024-12-31 20:12:06,270 - openai - DEBUG - api_version=None data='{"model": "gpt-4-1106-preview", "messages": [{"role": "system", "content": "You are a legal contract analysis assistant. Analyze the contract and provide a detailed analysis in the following format:\\n\\n## Summary\\n[Provide a clear, concise summary of the contract\'s purpose and main points in a professional tone]\\n\\n## Key Points\\n[List each key point with proper markdown formatting. Use bold for headers and explain each point clearly]\\n\\n1. **Parties Involved**: [Details]\\n2. **Purpose**: [Details]\\n3. **Terms**: [Details]\\n[Continue with other relevant points...]\\n\\n## Suggestions for Improvement\\n[Provide specific, actionable suggestions in a clear format]\\n\\n1. **[Suggestion Title]**: [Detailed explanation]\\n2. **[Suggestion Title]**: [Detailed explanation]\\n[Continue with other suggestions...]\\n\\nNote: Use proper markdown formatting:\\n- Bold (**) for important terms\\n- Lists for better readability\\n- Clear section breaks\\n- Professional tone throughout"}, {"role": "user", "content": "Please analyze this contract:\\n\\nSERVICE AGREEMENT\\n\\nThis Service Agreement (the \\"Agreement\\") is entered into as of [DATE] by and between:\\n\\n[SERVICE PROVIDER NAME] (\\"Provider\\")\\nand\\n[CLIENT NAME] (\\"Client\\")\\n\\n1. Services\\nProvider agrees to provide the following services to Client: [DESCRIPTION OF SERVICES]\\n\\n2. Compensation\\nClient agrees to compensate Provider as follows: [PAYMENT TERMS]\\n\\n3. Term\\nThis Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.\\n\\n4. Independent Contractor\\nProvider is an independent contractor, and nothing in this Agreement shall create an employer-employee relationship.\\n\\n5. Confidentiality\\nBoth parties agree to maintain the confidentiality of any proprietary information shared during the course of this Agreement.\\n\\nIN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.\\n\\n[SERVICE PROVIDER]\\nBy: ____________________\\n\\n[CLIENT]\\nBy: ____________________"}], "temperature": 0.7}' message='Post details'
+2024-12-31 20:12:31,363 - openai - DEBUG - message='OpenAI API response' path=https://api.openai.com/v1/chat/completions processing_ms=24893 request_id=req_1d3681e80746b88a4381465155f5e122 response_code=200
+2024-12-31 20:12:31,374 - __main__ - INFO - Received response from OpenAI
+2024-12-31 20:12:31,374 - __main__ - INFO - Analysis length: 2758
+2024-12-31 20:12:31,374 - __main__ - INFO - Response: b'{\n  "analysis": "## Summary\\nThis Service Agreement outlines the contractual relationship between a service provider and a client, where the provider agrees to deliver specified services in exchange for compensation from the client. It defines the term of the agreement, clarifies the independent contractor status of the provider, and includes a confidentiality clause. The agreement is finalized by the signatures of both parties.\\n\\n## Key Points\\n\\n1. **Parties Involved**: \\n   - The \\"Provider\\" is [SERVICE PROVIDER NAME], who will be offering the services.\\n   - The \\"Client\\" is [CLIENT NAME], who will be receiving the services.\\n\\n2. **Purpose**: \\n   - The Agreement specifies the engagement terms between Provider and Client for the provision of services detailed within the contract.\\n\\n3. **Services**: \\n   - Provider will deliver services as described in [DESCRIPTION OF SERVICES].\\n\\n4. **Compensation**: \\n   - Client will compensate the Provider according to the [PAYMENT TERMS] outlined in the Agreement.\\n\\n5. **Term**: \\n   - The Agreement is set to begin on [START DATE] and will continue until [END DATE], with the option for early termination.\\n\\n6. **Independent Contractor**: \\n   - The Agreement establishes the Provider as an independent contractor, negating any employer-employee relationship.\\n\\n7. **Confidentiality**: \\n   - Both parties are bound to keep proprietary information confidential throughout and after the term of the Agreement.\\n\\n8. **Execution**: \\n   - The Agreement requires the signatures of authorized representatives from both the Provider and the Client to be legally binding.\\n\\n## Suggestions for Improvement\\n\\n1. **Clear Definitions**:\\n   - Define terms such as \\"proprietary information\\" within the confidentiality clause to ensure clear understanding of what is covered by the clause.\\n\\n2. **Termination Clauses**:\\n   - Include specific terms regarding the early termination of the Agreement, such as notice periods and any applicable penalties or conditions.\\n\\n3. **Dispute Resolution**:\\n   - Incorporate a clause that outlines the method for dispute resolution between parties, should any disagreements arise.\\n\\n4. **Service Level Agreement (SLA)**:\\n   - If relevant, add an SLA to define the expected level of service performance and remedies for any service failures.\\n\\n5. **Amendment Clause**:\\n   - Add a clause that specifies how the Agreement may be amended, ensuring that any changes are agreed upon in writing by both parties.\\n\\n6. **Governing Law**:\\n   - Specify which jurisdiction\'s law will govern the Agreement to clarify legal interpretation and enforcement.\\n\\n7. **Signatory Details**:\\n   - Provide a space for the signatories to print their names, titles, and the date of signing to clearly identify the individuals executing the Agreement.",\n  "success": true\n}\n'
+2024-12-31 20:12:31,385 - werkzeug - INFO - 127.0.0.1 - - [31/Dec/2024 20:12:31] "POST /api/analyze HTTP/1.1" 200 -
+2024-12-31 20:12:41,334 - openai - DEBUG - message='OpenAI API response' path=https://api.openai.com/v1/chat/completions processing_ms=34848 request_id=req_9c575a9812e4bf12ff6a3bacb55452ad response_code=200
+2024-12-31 20:12:41,335 - __main__ - INFO - Received response from OpenAI
+2024-12-31 20:12:41,335 - __main__ - INFO - Analysis length: 4414
+2024-12-31 20:12:41,336 - __main__ - INFO - Response: b'{\n  "analysis": "## Summary\\nThis Service Agreement is a legally binding document that outlines the nature of the professional relationship between a service provider and a client. It specifies the services to be provided, the compensation for those services, the duration of the agreement, the nature of the relationship as one of an independent contractor, and the obligation of confidentiality. The contract is executed with the signatures of both parties, evidencing their commitment to its terms.\\n\\n## Key Points\\n\\n1. **Parties Involved**:\\n   - **Service Provider**: Identified as \\"Provider\\" in the agreement.\\n   - **Client**: The entity receiving the services, identified as \\"Client\\".\\n\\n2. **Purpose**:\\n   - The purpose of this Agreement is to establish the terms under which the Provider will deliver services to the Client.\\n\\n3. **Services**:\\n   - The Provider agrees to provide specific services, which are to be detailed in the [DESCRIPTION OF SERVICES] section.\\n\\n4. **Compensation**:\\n   - The Client agrees to compensate the Provider as detailed in the [PAYMENT TERMS] section of the Agreement.\\n\\n5. **Term**:\\n   - The Agreement will be active from the [START DATE] until the [END DATE], with the possibility of early termination.\\n\\n6. **Independent Contractor**:\\n   - The Provider is considered an independent contractor, and there is no employer-employee relationship established by this Agreement.\\n\\n7. **Confidentiality**:\\n   - Both parties are obligated to keep proprietary information confidential throughout the term of this Agreement.\\n\\n8. **Execution**:\\n   - The Agreement is validated by the signatures of the authorized representatives of both the Service Provider and the Client.\\n\\n## Suggestions for Improvement\\n\\n1. **Fill in the Blanks**:\\n   - All bracketed placeholders such as [DATE], [SERVICE PROVIDER NAME], [CLIENT NAME], [DESCRIPTION OF SERVICES], [PAYMENT TERMS], [START DATE], and [END DATE] should be completed with the relevant details before the Agreement is executed to ensure clarity and enforceability.\\n\\n2. **Define Payment Terms Clearly**:\\n   - The section on compensation should explicitly mention the amount, method, and timing of payments to prevent misunderstandings or disputes. If the compensation is contingent on certain milestones or outcomes, these should be clearly stated.\\n\\n3. **Detail Services**:\\n   - The Agreement should itemize the services to be provided in the [DESCRIPTION OF SERVICES] section. If the services are complex or there are multiple components, consider attaching an exhibit or schedule to the Agreement for clarity.\\n\\n4. **Specify Termination Provisions**:\\n   - Although the Agreement mentions early termination, it should include specific terms under which either party may terminate the Agreement, including notice requirements and any potential penalties or obligations upon termination.\\n\\n5. **Address Intellectual Property Rights**:\\n   - If the services involve the creation of intellectual property, the Agreement should specify who owns the resulting intellectual property and outline any licensing arrangements.\\n\\n6. **Include Dispute Resolution Mechanism**:\\n   - The Agreement should state the process for resolving disputes, whether it be through arbitration, mediation, or court proceedings, including jurisdiction and choice of law.\\n\\n7. **Clarify Scope of Confidentiality**:\\n   - The confidentiality clause would benefit from more specificity regarding what constitutes proprietary information, how long the confidentiality obligation lasts, and any exceptions to the obligation.\\n\\n8. **Amendment and Waiver Provisions**:\\n   - It is advisable to include a clause on how the Agreement can be amended, and the effects of waiving any terms should be stated to ensure that such actions are intentional and documented.\\n\\n9. **Include Entire Agreement Clause**:\\n   - An entire agreement or integration clause should be added to affirm that the written contract represents the full understanding between the parties, superseding all prior negotiations or agreements.\\n\\n10. **Signatory Authority Confirmation**:\\n    - The Agreement should include a statement to confirm that the individuals signing on behalf of the Provider and Client have the authority to bind their respective parties to the terms of the Agreement.\\n\\nBy addressing these suggestions, the parties can ensure that the Service Agreement is comprehensive, clear, and tailored to their specific arrangement.",\n  "success": true\n}\n'
+2024-12-31 20:12:41,351 - werkzeug - INFO - 127.0.0.1 - - [31/Dec/2024 20:12:41] "POST /api/analyze HTTP/1.1" 200 -
+2024-12-31 20:13:55,843 - werkzeug - INFO -  * Detected change in 'c:\\Users\\markv\\Dropbox\\projects\\docusign\\app.py', reloading
+2024-12-31 20:13:55,843 - werkzeug - INFO -  * Detected change in 'c:\\Users\\markv\\Dropbox\\projects\\docusign\\app.py', reloading
+2024-12-31 20:13:55,844 - werkzeug - INFO -  * Detected change in 'c:\\Users\\markv\\Dropbox\\projects\\docusign\\app.py', reloading
+2024-12-31 20:13:55,844 - werkzeug - INFO -  * Detected change in 'c:\\Users\\markv\\Dropbox\\projects\\docusign\\app.py', reloading
+2024-12-31 20:13:55,844 - werkzeug - INFO -  * Detected change in 'C:\\Users\\markv\\Dropbox\\projects\\docusign\\app.py', reloading
+2024-12-31 20:13:55,846 - werkzeug - INFO -  * Detected change in 'C:\\Users\\markv\\Dropbox\\projects\\docusign\\app.py', reloading
+2024-12-31 20:13:55,847 - werkzeug - INFO -  * Detected change in 'C:\\Users\\markv\\Dropbox\\projects\\docusign\\app.py', reloading
+2024-12-31 20:13:56,868 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
