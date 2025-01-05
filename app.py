@@ -23,6 +23,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import tempfile
 import os
+from flask import has_request_context
 
 # Load environment variables
 load_dotenv()
@@ -43,9 +44,34 @@ Session(app)
 init_db()
 
 # Configure OpenAI
-openai.api_key = os.getenv('OPENAI_API_KEY')
+def configure_openai():
+    openai.api_key = get_openai_key()
 
-# DocuSign configuration
+@app.before_request
+def before_request():
+    configure_openai()
+    configure_docusign()
+
+def get_openai_key():
+    if not has_request_context():
+        return os.getenv('OPENAI_API_KEY')
+    return session.get('openai_key') or os.getenv('OPENAI_API_KEY')
+
+def get_docusign_key():
+    if not has_request_context():
+        return os.getenv('DOCUSIGN_INTEGRATION_KEY')
+    return session.get('docusign_key') or os.getenv('DOCUSIGN_INTEGRATION_KEY')
+
+def configure_docusign():
+    app.config.update(
+        DOCUSIGN_INTEGRATION_KEY=get_docusign_key(),
+        DOCUSIGN_USER_ID=os.getenv('DOCUSIGN_USER_ID'),
+        DOCUSIGN_ACCOUNT_ID=os.getenv('DOCUSIGN_ACCOUNT_ID'),
+        DOCUSIGN_PRIVATE_KEY_PATH='private.key',
+        DOCUSIGN_AUTH_SERVER='account-d.docusign.com'
+    )
+
+# Initial configuration with environment variables
 app.config.update(
     DOCUSIGN_INTEGRATION_KEY=os.getenv('DOCUSIGN_INTEGRATION_KEY'),
     DOCUSIGN_USER_ID=os.getenv('DOCUSIGN_USER_ID'),
@@ -170,6 +196,23 @@ def callback():
     return send_file('static/callback.html')
 
 # API routes start with /api
+@app.route('/api/settings/save', methods=['POST'])
+def save_settings():
+    try:
+        data = request.get_json()
+        openai_key = data.get('openaiKey')
+        docusign_key = data.get('docusignKey')
+        
+        # Store keys in session
+        if openai_key:
+            session['openai_key'] = openai_key
+        if docusign_key:
+            session['docusign_key'] = docusign_key
+            
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+
 @app.route('/api/auth/docusign-config')
 def get_docusign_config():
     return jsonify({

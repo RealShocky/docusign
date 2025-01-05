@@ -165,6 +165,233 @@ function App() {
     const [customContent, setCustomContent] = React.useState('');
     const [showCustomModal, setShowCustomModal] = React.useState(false);
 
+    function openHelpModal() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900">Help & Documentation</h3>
+                    <button onclick="this.closest('.fixed').remove()" 
+                        class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="space-y-8 text-gray-600">
+                    <!-- Getting Started -->
+                    <section>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-3">Getting Started</h4>
+                        <div class="space-y-3">
+                            <p>ContractIQ is your intelligent contract management solution that helps you create, analyze, and manage contracts efficiently.</p>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="font-medium text-blue-800">Quick Start:</p>
+                                <ol class="list-decimal ml-4 mt-2 space-y-2 text-blue-700">
+                                    <li>Choose a contract template or upload your own</li>
+                                    <li>Customize the contract content</li>
+                                    <li>Use AI analysis for risk assessment</li>
+                                    <li>Send for signatures via DocuSign</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Features -->
+                    <section>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-3">Features</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 border rounded-lg">
+                                <h5 class="font-medium text-gray-800 mb-2">📝 Contract Templates</h5>
+                                <ul class="list-disc ml-4 space-y-1">
+                                    <li>Pre-built professional templates</li>
+                                    <li>Custom contract upload</li>
+                                    <li>Template customization</li>
+                                    <li>Save custom templates</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 border rounded-lg">
+                                <h5 class="font-medium text-gray-800 mb-2">🤖 AI Analysis</h5>
+                                <ul class="list-disc ml-4 space-y-1">
+                                    <li>Risk assessment</li>
+                                    <li>Legal clause analysis</li>
+                                    <li>Language improvement suggestions</li>
+                                    <li>Compliance checking</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 border rounded-lg">
+                                <h5 class="font-medium text-gray-800 mb-2">✍️ DocuSign Integration</h5>
+                                <ul class="list-disc ml-4 space-y-1">
+                                    <li>Electronic signatures</li>
+                                    <li>Automatic field placement</li>
+                                    <li>Multi-party signing</li>
+                                    <li>Status tracking</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 border rounded-lg">
+                                <h5 class="font-medium text-gray-800 mb-2">👥 Collaboration</h5>
+                                <ul class="list-disc ml-4 space-y-1">
+                                    <li>Invite team members</li>
+                                    <li>Comment on contracts</li>
+                                    <li>Version history</li>
+                                    <li>Change tracking</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Settings Guide -->
+                    <section>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-3">Settings Configuration</h4>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-medium text-gray-800 mb-2">API Keys Setup</h5>
+                                <p class="mb-2">Configure your own API keys for enhanced functionality:</p>
+                                <ul class="list-disc ml-4 space-y-2">
+                                    <li>
+                                        <span class="font-medium">OpenAI API Key:</span>
+                                        <ul class="list-circle ml-4 mt-1">
+                                            <li>Required for AI analysis features</li>
+                                            <li>Get your key from <a href="https://platform.openai.com/api-keys" target="_blank" class="text-blue-600 hover:underline">OpenAI Dashboard</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <span class="font-medium">DocuSign Integration Key:</span>
+                                        <ul class="list-circle ml-4 mt-1">
+                                            <li>Required for electronic signatures</li>
+                                            <li>Available in your <a href="https://admin.docusign.com/api-integrator-key" target="_blank" class="text-blue-600 hover:underline">DocuSign Admin</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- How-To Guides -->
+                    <section>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-3">How-To Guides</h4>
+                        <div class="space-y-4">
+                            <div class="border-l-4 border-green-500 pl-4">
+                                <h5 class="font-medium text-gray-800 mb-2">Creating a New Contract</h5>
+                                <ol class="list-decimal ml-4 space-y-2">
+                                    <li>Select a template or choose "Custom Contract"</li>
+                                    <li>Fill in the required fields and customize content</li>
+                                    <li>Click "Analyze" for AI-powered suggestions</li>
+                                    <li>Review and make necessary changes</li>
+                                    <li>Click "Send for Signature" when ready</li>
+                                </ol>
+                            </div>
+                            <div class="border-l-4 border-blue-500 pl-4">
+                                <h5 class="font-medium text-gray-800 mb-2">Collaborating with Team</h5>
+                                <ol class="list-decimal ml-4 space-y-2">
+                                    <li>Open the contract you want to share</li>
+                                    <li>Click "Invite Collaborator" button</li>
+                                    <li>Enter collaborator's email</li>
+                                    <li>Set permissions and send invitation</li>
+                                    <li>Track changes and comments in real-time</li>
+                                </ol>
+                            </div>
+                            <div class="border-l-4 border-purple-500 pl-4">
+                                <h5 class="font-medium text-gray-800 mb-2">Using AI Analysis</h5>
+                                <ol class="list-decimal ml-4 space-y-2">
+                                    <li>Select or upload your contract</li>
+                                    <li>Click the "Analyze" button</li>
+                                    <li>Review risk assessment and suggestions</li>
+                                    <li>Apply recommended changes as needed</li>
+                                    <li>Generate improved versions with AI assistance</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Support -->
+                    <section>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-3">Support</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="mb-4">Need additional help? Our support team is here for you:</p>
+                            <ul class="space-y-2">
+                                <li>📧 Email: <a href="mailto:support@contractiq.ai" class="text-blue-600 hover:underline">support@contractiq.ai</a></li>
+                                <li>📚 Documentation: <a href="https://docs.contractiq.ai" target="_blank" class="text-blue-600 hover:underline">docs.contractiq.ai</a></li>
+                                <li>💬 Live Chat: Available in bottom-right corner during business hours</li>
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button onclick="this.closest('.fixed').remove()" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    function openSettingsModal() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 class="text-xl font-bold mb-4 text-gray-900">Settings</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">API Configuration</label>
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-sm text-gray-600">OpenAI API Key</label>
+                                <input type="password" id="openaiKey" class="w-full p-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600">DocuSign Integration Key</label>
+                                <input type="password" id="docusignKey" class="w-full p-2 border rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button onclick="this.closest('.fixed').remove()" 
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button onclick="saveSettings(this)" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Save</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    // Function to save settings
+    window.saveSettings = async function(button) {
+        const modal = button.closest('.fixed');
+        const openaiKey = modal.querySelector('#openaiKey').value;
+        const docusignKey = modal.querySelector('#docusignKey').value;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/settings/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    openaiKey,
+                    docusignKey
+                })
+            });
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                alert('Settings saved successfully!');
+                modal.remove();
+            } else {
+                alert('Error saving settings: ' + data.message);
+            }
+        } catch (error) {
+            alert('Error saving settings: ' + error.message);
+        }
+    };
+
     // Custom Template Card Component
     const CustomTemplateCard = ({ onClick }) => {
         return e('div', {
@@ -585,7 +812,7 @@ function App() {
                         Or provide custom instructions:
                     </label>
                     <textarea id="rewriteInstructions" 
-                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="w-full h-24 p-2 border rounded-lg" 
                         rows="4"
                         placeholder="Enter your specific requirements for the rewrite..."></textarea>
                 </div>
@@ -797,12 +1024,22 @@ function App() {
             e('div', { className: 'container mx-auto flex justify-between items-center' },
                 e('div', { className: 'flex items-center space-x-2' },
                     e('h1', { className: 'text-2xl font-bold' }, 'ContractIQ'),
-                    e('span', { className: 'text-sm text-cyan-200 ml-3' }, 'Intelligent Contract Management')
+                    e('span', { className: 'text-sm opacity-75' }, 'Intelligent Contract Management')
                 ),
-                e('button', {
-                    className: 'bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors',
-                    onClick: () => setShowInviteModal(true)
-                }, 'Invite Collaborator')
+                e('div', { className: 'flex items-center space-x-4' },
+                    e('button', {
+                        className: 'text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors',
+                        onClick: openHelpModal
+                    }, '❓ Help'),
+                    e('button', {
+                        className: 'text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors',
+                        onClick: openSettingsModal
+                    }, '⚙️ Settings'),
+                    e('button', {
+                        className: 'bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors',
+                        onClick: () => setShowInviteModal(true)
+                    }, 'Invite Collaborator')
+                )
             )
         ),
 
