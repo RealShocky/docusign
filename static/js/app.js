@@ -1,13 +1,13 @@
+// Make React.createElement global
 const e = React.createElement;
-// React Components
 
 // API Configuration
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:5000'
-    : 'http://vibrationrobotics.com/docusign';
+    : 'https://vibrationrobotics.com/docusign';
 
-// Contract Templates Data with actual content
-const contractTemplates = [
+// Contract Templates Data
+const templates = [
     {
         id: 1,
         name: 'Non-Disclosure Agreement (NDA)',
@@ -21,25 +21,10 @@ This Non-Disclosure Agreement (this "Agreement") is made effective as of [DATE] 
 The parties wish to explore a business opportunity of mutual interest and in connection with this opportunity, each party may disclose to the other certain confidential technical and business information that the disclosing party desires the receiving party to treat as confidential.
 
 2. Confidential Information
-"Confidential Information" means any information disclosed by either party to the other party, either directly or indirectly, in writing, orally or by inspection of tangible objects, including without limitation documents, prototypes, samples, technical data, trade secrets, know-how, research, product plans, services, customer lists, markets, software, developments, inventions, processes, formulas, technology, designs, drawings, engineering, hardware configuration information, marketing, finances or other business information.
+"Confidential Information" means any information disclosed by either party to the other party, either directly or indirectly, in writing, orally or by inspection of tangible objects.
 
 3. Term
-This Agreement will terminate five (5) years after the Effective Date.
-
-4. Governing Law
-This Agreement shall be governed by and construed in accordance with the laws of [STATE/JURISDICTION].
-
-IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date.
-
-[PARTY A]
-By: ____________________
-Name:
-Title:
-
-[PARTY B]
-By: ____________________
-Name:
-Title:`
+This Agreement will terminate five (5) years after the Effective Date.`
     },
     {
         id: 2,
@@ -48,11 +33,7 @@ Title:`
         icon: '📋',
         content: `SERVICE AGREEMENT
 
-This Service Agreement (the "Agreement") is entered into as of [DATE] by and between:
-
-[SERVICE PROVIDER NAME] ("Provider")
-and
-[CLIENT NAME] ("Client")
+This Service Agreement (the "Agreement") is entered into as of [DATE] by and between [PROVIDER] and [CLIENT].
 
 1. Services
 Provider agrees to provide the following services to Client: [DESCRIPTION OF SERVICES]
@@ -61,21 +42,7 @@ Provider agrees to provide the following services to Client: [DESCRIPTION OF SER
 Client agrees to compensate Provider as follows: [PAYMENT TERMS]
 
 3. Term
-This Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.
-
-4. Independent Contractor
-Provider is an independent contractor, and nothing in this Agreement shall create an employer-employee relationship.
-
-5. Confidentiality
-Both parties agree to maintain the confidentiality of any proprietary information shared during the course of this Agreement.
-
-IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.
-
-[SERVICE PROVIDER]
-By: ____________________
-
-[CLIENT]
-By: ____________________`
+This Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.`
     },
     {
         id: 3,
@@ -84,570 +51,576 @@ By: ____________________`
         icon: '👥',
         content: `EMPLOYMENT AGREEMENT
 
-This Employment Agreement (the "Agreement") is entered into as of [DATE] by and between:
+This Employment Agreement (the "Agreement") is entered into as of [DATE] by and between [EMPLOYER] and [EMPLOYEE].
 
-[COMPANY NAME] ("Company")
-and
-[EMPLOYEE NAME] ("Employee")
+1. Position and Duties
+Employee shall serve in the position of [POSITION] and shall perform the duties assigned by Employer.
 
-1. Employment
-The Company agrees to employ the Employee as [POSITION] and the Employee agrees to serve in such capacity.
+2. Compensation
+Employer shall pay Employee a base salary of [AMOUNT] per year, payable in accordance with Employer's standard payroll practices.
 
-2. Term
-This Agreement shall commence on [START DATE] and continue until [END DATE], unless terminated earlier.
-
-3. Compensation
-The Company agrees to compensate the Employee as follows: [PAYMENT TERMS]
-
-4. Benefits
-The Employee shall be entitled to the following benefits: [BENEFITS]
-
-5. Confidentiality
-The Employee agrees to maintain the confidentiality of any proprietary information shared during the course of this Agreement.
-
-IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.
-
-[COMPANY]
-By: ____________________
-
-[EMPLOYEE]
-By: ____________________`
+3. Benefits
+Employee shall be entitled to participate in all employee benefit plans and programs offered by Employer.`
     },
     {
         id: 4,
         name: 'Sales Contract',
         description: 'Template for product/service sales agreements',
-        icon: '💼',
+        icon: '🛍️',
         content: `SALES AGREEMENT
 
-This Sales Agreement (the "Agreement") is entered into as of [DATE] by and between:
+This Sales Agreement (the "Agreement") is entered into as of [DATE] by and between [SELLER] and [BUYER].
 
-[SELLER NAME] ("Seller")
-and
-[BUYER NAME] ("Buyer")
+1. Products/Services
+Seller agrees to sell and Buyer agrees to purchase the following: [DESCRIPTION]
 
-1. Sale
-The Seller agrees to sell to the Buyer the following products/services: [DESCRIPTION OF PRODUCTS/SERVICES]
+2. Price and Payment
+The total purchase price shall be [AMOUNT], payable as follows: [PAYMENT TERMS]
 
-2. Price
-The Buyer agrees to pay the Seller the following price: [PRICE]
+3. Delivery
+Seller shall deliver the products/services as follows: [DELIVERY TERMS]`
+    },
+    {
+        id: 5,
+        name: 'Lease Agreement',
+        description: 'Property rental/lease contract template',
+        icon: '🏠',
+        content: `LEASE AGREEMENT
 
-3. Payment Terms
-The Buyer agrees to pay the Seller as follows: [PAYMENT TERMS]
+This Lease Agreement (the "Agreement") is entered into as of [DATE] by and between [LANDLORD] and [TENANT].
 
-4. Delivery
-The Seller agrees to deliver the products/services to the Buyer as follows: [DELIVERY TERMS]
+1. Property
+Landlord leases to Tenant the property located at: [ADDRESS]
 
-5. Warranty
-The Seller warrants that the products/services will be free from defects in material and workmanship.
+2. Term
+The lease term shall be [DURATION] beginning on [START DATE] and ending on [END DATE].
 
-IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.
+3. Rent
+Tenant shall pay rent of [AMOUNT] per month, due on the [DAY] of each month.`
+    },
+    {
+        id: 6,
+        name: 'Partnership Agreement',
+        description: 'Business partnership contract template',
+        icon: '🤝',
+        content: `PARTNERSHIP AGREEMENT
 
-[SELLER]
-By: ____________________
+This Partnership Agreement (the "Agreement") is entered into as of [DATE] by and between [PARTNER A] and [PARTNER B].
 
-[BUYER]
-By: ____________________`
+1. Formation
+The partners hereby form a partnership under the name [PARTNERSHIP NAME].
+
+2. Capital Contributions
+Each partner shall contribute the following: [CONTRIBUTIONS]
+
+3. Profit and Loss Sharing
+Partners shall share profits and losses as follows: [TERMS]`
+    },
+    {
+        id: 7,
+        name: 'Consulting Agreement',
+        description: 'Professional consulting services template',
+        icon: '💡',
+        content: `CONSULTING AGREEMENT
+
+This Consulting Agreement (the "Agreement") is entered into as of [DATE] by and between [CONSULTANT] and [CLIENT].
+
+1. Services
+Consultant shall provide the following consulting services: [SERVICES]
+
+2. Compensation
+Client shall pay Consultant [RATE] per [PERIOD], plus approved expenses.
+
+3. Term
+This Agreement shall commence on [START DATE] and continue until [END DATE].`
+    },
+    {
+        id: 8,
+        name: 'Software License',
+        description: 'Software licensing and usage agreement',
+        icon: '💻',
+        content: `SOFTWARE LICENSE AGREEMENT
+
+This Software License Agreement (the "Agreement") is entered into as of [DATE] by and between [LICENSOR] and [LICENSEE].
+
+1. License Grant
+Licensor grants Licensee a [TYPE] license to use the software known as [SOFTWARE NAME].
+
+2. Restrictions
+Licensee shall not: [RESTRICTIONS]
+
+3. Term
+This license shall be effective for [DURATION] from the effective date.`
     }
 ];
 
-// Template Card Component
-function TemplateCard({ template, onSelect }) {
-    return e('div', {
-        className: 'bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200',
-        onClick: () => onSelect(template)
-    },
-        e('div', { className: 'text-3xl mb-2' }, template.icon),
-        e('h3', { className: 'text-lg font-semibold mb-1' }, template.name),
-        e('p', { className: 'text-gray-600 text-sm' }, template.description)
-    );
-}
-
-// Contract Templates Component
-function ContractTemplates({ onSelectTemplate }) {
-    return e('div', { className: 'bg-white rounded-xl p-6 shadow-sm' },
-        e('h2', { className: 'text-xl font-semibold mb-4' }, 'Contract Templates'),
-        e('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-4' },
-            contractTemplates.map(template =>
-                e(TemplateCard, {
-                    key: template.id,
-                    template: template,
-                    onSelect: onSelectTemplate
-                })
-            )
-        )
-    );
-}
-
-// Debug logging
-console.log('App.js loaded');
-console.log('API Base URL:', API_BASE_URL);
-console.log('Protocol:', window.location.protocol);
-console.log('Hostname:', window.location.hostname);
-
+// React Components
 function App() {
-    // State
-    const [showHelp, setShowHelp] = React.useState(false);
-    const [showSettings, setShowSettings] = React.useState(false);
-    const [showPastePrompt, setShowPastePrompt] = React.useState(false);
     const [selectedTemplate, setSelectedTemplate] = React.useState(null);
-    const [analysis, setAnalysis] = React.useState(null);
-    const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-    const [showRewritePrompt, setShowRewritePrompt] = React.useState(false);
-    const [rewritePrompt, setRewritePrompt] = React.useState('');
-    const [contract, setContract] = React.useState('');
-    const [isRewriting, setIsRewriting] = React.useState(false);
-    const [error, setError] = React.useState(null);
-    const [uploadedFile, setUploadedFile] = React.useState(null);
-    const [dragActive, setDragActive] = React.useState(false);
-    const [signers, setSigners] = React.useState([{ name: '', email: '' }]);
-    const [pasteContent, setPasteContent] = React.useState('');
-    const fileInputRef = React.useRef(null);
-    const textareaRef = React.useRef(null);
-
-    // Add state for signature positions
-    const [signaturePositions, setSignaturePositions] = React.useState([]);
-    const [isAnalyzingPositions, setIsAnalyzingPositions] = React.useState(false);
-    const [showPositionSelector, setShowPositionSelector] = React.useState(false);
-
-    // Add state for risk analysis
-    const [showRiskAnalysis, setShowRiskAnalysis] = React.useState(false);
     const [riskAnalysis, setRiskAnalysis] = React.useState(null);
+    const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+    const [error, setError] = React.useState(null);
+    const [showInviteModal, setShowInviteModal] = React.useState(false);
+    const [showRiskAnalysis, setShowRiskAnalysis] = React.useState(false);
+    const [customContent, setCustomContent] = React.useState('');
+    const [showCustomModal, setShowCustomModal] = React.useState(false);
 
-    // Add loading states
-    const [isSending, setIsSending] = React.useState(false);
-    const [isAnalyzingRisks, setIsAnalyzingRisks] = React.useState(false);
+    // Custom Template Card Component
+    const CustomTemplateCard = ({ onClick }) => {
+        return e('div', {
+            className: 'bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6 cursor-pointer text-white',
+            onClick: onClick
+        },
+            e('div', { className: 'flex items-start space-x-4' },
+                e('div', { className: 'text-3xl' }, '📝'),
+                e('div', { className: 'flex-1' },
+                    e('h3', { className: 'text-lg font-semibold mb-1' }, 'Custom Contract'),
+                    e('p', { className: 'text-sm opacity-90' }, 'Upload or paste your own contract')
+                )
+            )
+        );
+    };
 
-    // Add new state for success modal
-    const [showSuccessModal, setShowSuccessModal] = React.useState(false);
+    // Custom Contract Modal
+    const CustomContractModal = ({ isOpen, onClose }) => {
+        if (!isOpen) return null;
 
-    // Add state for collaboration
-    const [refreshKey, setRefreshKey] = React.useState(0);
+        const handleFileUpload = async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
 
-    // Error Boundary
-    React.useEffect(() => {
-        window.onerror = (msg, url, lineNo, columnNo, error) => {
-            console.error('Global error:', { msg, url, lineNo, columnNo, error });
-            return false;
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                setIsAnalyzing(true); // Show loading state while processing
+                const response = await fetch(`${API_BASE_URL}/api/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+
+                const result = await response.json();
+                if (result.content) {
+                    setCustomContent(result.content);
+                    onClose();
+                    handleCustomTemplate(result.content);
+                } else {
+                    throw new Error('No content returned');
+                }
+            } catch (err) {
+                console.error('Upload error:', err);
+                setError('Failed to process file. Please try a different format or paste the content directly.');
+            } finally {
+                setIsAnalyzing(false);
+            }
         };
-    }, []);
+
+        const handlePaste = () => {
+            const content = document.getElementById('pasteArea').value;
+            if (content) {
+                setCustomContent(content);
+                onClose();
+                handleCustomTemplate(content);
+            }
+        };
+
+        const handleDragOver = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const handleDrop = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                const input = document.querySelector('input[type="file"]');
+                input.files = files;
+                handleFileUpload({ target: input });
+            }
+        };
+
+        return e('div', {
+            className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50',
+            onClick: onClose
+        },
+            e('div', {
+                className: 'bg-white rounded-lg p-6 max-w-2xl w-full mx-4',
+                onClick: e => e.stopPropagation()
+            },
+                e('div', { className: 'flex justify-between items-center mb-6' },
+                    e('h2', { className: 'text-2xl font-bold' }, 'Add Custom Contract'),
+                    e('button', {
+                        className: 'text-gray-500 hover:text-gray-700 text-2xl',
+                        onClick: onClose
+                    }, '×')
+                ),
+                e('div', { className: 'space-y-6' },
+                    // File Upload with Drag & Drop
+                    e('div', {
+                        className: 'border-2 border-dashed border-gray-300 rounded-lg p-8 text-center space-y-4 hover:border-blue-500 transition-colors',
+                        onDragOver: handleDragOver,
+                        onDrop: handleDrop
+                    },
+                        e('div', { className: 'text-6xl mb-4' }, '📄'),
+                        e('p', { className: 'text-gray-600' }, 'Drag and drop your contract file here'),
+                        e('p', { className: 'text-sm text-gray-500' }, 'or'),
+                        e('input', {
+                            type: 'file',
+                            accept: '.txt,.doc,.docx,.pdf',
+                            onChange: handleFileUpload,
+                            className: 'hidden',
+                            id: 'fileInput'
+                        }),
+                        e('button', {
+                            className: 'bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg inline-flex items-center space-x-2',
+                            onClick: () => document.getElementById('fileInput').click()
+                        },
+                            e('span', { className: 'text-xl' }, '📎'),
+                            e('span', null, 'Choose File')
+                        ),
+                        e('p', { className: 'text-xs text-gray-500 mt-2' }, 'Supports PDF (including compressed), DOC, DOCX, and TXT files')
+                    ),
+                    // Or Divider
+                    e('div', { className: 'flex items-center' },
+                        e('div', { className: 'flex-1 border-t' }),
+                        e('div', { className: 'px-4 text-gray-500' }, 'OR'),
+                        e('div', { className: 'flex-1 border-t' })
+                    ),
+                    // Paste Area
+                    e('div', { className: 'space-y-2' },
+                        e('label', { className: 'block font-medium' }, 'Paste Contract Text'),
+                        e('textarea', {
+                            id: 'pasteArea',
+                            className: 'w-full h-48 p-2 border rounded',
+                            placeholder: 'Paste your contract text here...'
+                        }),
+                        e('button', {
+                            className: 'w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex items-center justify-center space-x-2',
+                            onClick: handlePaste
+                        },
+                            e('span', { className: 'text-xl' }, '📋'),
+                            e('span', null, 'Use Pasted Text')
+                        )
+                    )
+                ),
+                error && e('div', {
+                    className: 'mt-4 p-4 bg-red-50 text-red-700 rounded-lg'
+                }, error)
+            )
+        );
+    };
+
+    // Handle custom template
+    const handleCustomTemplate = (content) => {
+        const customTemplate = {
+            id: 'custom-' + Date.now(),
+            name: 'Custom Contract',
+            description: 'Your uploaded or pasted contract',
+            icon: '📝',
+            content: content
+        };
+        setSelectedTemplate(customTemplate);
+        setRiskAnalysis(null);
+        setError(null);
+        setShowRiskAnalysis(false);
+    };
+
+    // Template Card Component
+    const TemplateCard = ({ template, onSelect, isSelected }) => {
+        return e('div', {
+            className: `bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6 cursor-pointer ${isSelected ? 'ring-2 ring-blue-500' : ''}`,
+            onClick: () => onSelect(template)
+        },
+            e('div', { className: 'flex items-start space-x-4' },
+                e('div', { className: 'text-3xl' }, template.icon),
+                e('div', { className: 'flex-1' },
+                    e('h3', { className: 'text-lg font-semibold text-gray-900 mb-1' }, template.name),
+                    e('p', { className: 'text-gray-600 text-sm' }, template.description)
+                )
+            )
+        );
+    };
 
     // Handle template selection
     const handleTemplateSelect = async (template) => {
         console.log('Template selected:', template);
+        setSelectedTemplate(template);
+        setRiskAnalysis(null);
+        setError(null);
+        setShowRiskAnalysis(false);
+    };
+
+    // Handle contract analysis
+    async function handleContractAnalysis(content) {
         try {
             setIsAnalyzing(true);
-            setSelectedTemplate(template);
-            setContract(template.content);
-            setUploadedFile('Template: ' + template.name);
-
-            // Analyze the template content
-            console.log('Sending analysis request...');
             const response = await fetch(`${API_BASE_URL}/api/analyze`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    content: template.content
-                })
+                body: JSON.stringify({ content })
             });
 
-            console.log('Analysis response status:', response.status);
-            
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Analysis error response:', errorText);
-                throw new Error(`Analysis failed: ${errorText}`);
+                throw new Error('Analysis failed');
             }
 
             const result = await response.json();
-            console.log('Analysis result:', result);
-            
-            if (result.error) {
-                throw new Error(result.error);
-            }
-            
-            setAnalysis(result.analysis);
-            setError(null);
-        } catch (error) {
-            console.error('Error in handleTemplateSelect:', error);
-            setError(error.message);
-            setAnalysis(null);
+            console.log('Contract analysis response:', result); // Debug log
+            displayContractAnalysis(result);
+        } catch (err) {
+            console.error('Analysis error:', err);
+            alert(err.message || 'Failed to analyze contract');
         } finally {
             setIsAnalyzing(false);
         }
-    };
-
-    // Handle analysis
-    const handleAnalyze = async (content) => {
-        if (!content || isAnalyzing) return;
-        
-        setIsAnalyzing(true);
-        try {
-            setAnalysis(null);
-            setError(null);
-
-            const response = await fetch(`${API_BASE_URL}/api/analyze`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    content: content
-                })
-            });
-
-            console.log('Analysis response status:', response.status);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Analysis error response:', errorText);
-                throw new Error(`Analysis failed: ${errorText}`);
-            }
-
-            const result = await response.json();
-            console.log('Analysis result:', result);
-
-            if (result.error) {
-                throw new Error(result.error);
-            }
-
-            setAnalysis(result.analysis);
-        } catch (error) {
-            console.error('Analysis error:', error);
-            setError(error.message);
-            setAnalysis(null);
-        } finally {
-            setIsAnalyzing(false);
-        }
-    };
-
-    // Function to analyze signature positions
-    const analyzeSignaturePositions = async () => {
-        if (!contract) return;
-        
-        setIsAnalyzingPositions(true);
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/analyze-signature-positions`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ content: contract })
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to analyze signature positions');
-            }
-            
-            const result = await response.json();
-            if (result.success && result.positions) {
-                // Parse the positions JSON string
-                const positions = typeof result.positions === 'string' 
-                    ? JSON.parse(result.positions) 
-                    : result.positions;
-                
-                setSignaturePositions(positions);
-                
-                // Show success message with suggestions
-                setError({
-                    type: 'success',
-                    message: 'AI has suggested signature positions. You can review and adjust them before sending.'
-                });
-            }
-        } catch (err) {
-            console.error('Error analyzing signature positions:', err);
-            setError({
-                type: 'error',
-                message: 'Failed to analyze signature positions: ' + err.message
-            });
-        } finally {
-            setIsAnalyzingPositions(false);
-        }
-    };
-
-    // Function to handle signature position selection
-    const handlePositionSelect = (signerIndex, position) => {
-        const newPositions = [...signaturePositions];
-        newPositions[signerIndex] = position;
-        setSignaturePositions(newPositions);
-    };
-
-    // Update the send contract function to include positions
-    const handleSendContract = async () => {
-        if (!contract || signers.some(s => !s.email || !s.name) || isSending) {
-            setError({
-                type: 'error',
-                message: 'Please fill in all signer information'
-            });
-            return;
-        }
-
-        try {
-            setIsSending(true);
-            const response = await fetch(`${API_BASE_URL}/api/send`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contract,
-                    signers,
-                    signature_positions: signaturePositions
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to send contract');
-            }
-
-            const result = await response.json();
-            if (result.success) {
-                setShowSuccessModal(true);
-            }
-        } catch (err) {
-            console.error('Error sending contract:', err);
-            setError({
-                type: 'error',
-                message: 'Failed to send contract: ' + err.message
-            });
-        } finally {
-            setIsSending(false);
-        }
-    };
+    }
 
     // Handle risk analysis
-    const handleRiskAnalysis = async () => {
-        if (!contract || isAnalyzingRisks) return;
-        
-        setIsAnalyzingRisks(true);
+    async function handleRiskAnalysis(content) {
         try {
+            setIsAnalyzing(true);
             const response = await fetch(`${API_BASE_URL}/api/analyze/risks`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    content: contract
-                })
+                body: JSON.stringify({ content })
             });
 
             if (!response.ok) {
-                throw new Error('Failed to analyze risks');
+                throw new Error('Risk analysis failed');
             }
 
             const result = await response.json();
-            setRiskAnalysis(result);
-            setShowRiskAnalysis(true);
-            setError(null);
-        } catch (error) {
-            console.error('Risk analysis error:', error);
-            setError(error.message);
+            displayRiskAnalysis(result);
+        } catch (err) {
+            console.error('Risk analysis error:', err);
+            alert(err.message || 'Failed to analyze risks');
         } finally {
-            setIsAnalyzingRisks(false);
+            setIsAnalyzing(false);
         }
-    };
+    }
 
-    const handleCloseRiskAnalysis = () => {
-        setShowRiskAnalysis(false);
-    };
+    // Display contract analysis results
+    function displayContractAnalysis(analysis) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        };
 
-    // Render analysis section
-    const renderAnalysis = () => {
-        if (error) {
-            return e('div', { className: 'bg-red-50 p-4 rounded-lg' },
-                e('p', { className: 'text-red-600' }, error)
-            );
-        }
+        const content = document.createElement('div');
+        content.className = 'bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto';
+        
+        const analysisContent = analysis.sections && analysis.sections.length > 0 
+            ? analysis.sections.map(section => `
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold mb-4">${section.title}</h2>
+                    <div class="space-y-4">
+                        ${section.items ? section.items.map(item => `
+                            <div class="ml-4">
+                                <div class="text-blue-600">${item.title}</div>
+                                ${item.description ? `<div class="text-gray-700 ml-4">${item.description}</div>` : ''}
+                            </div>
+                        `).join('') : ''}
+                    </div>
+                </div>
+            `).join('')
+            : '<p>No analysis sections found.</p>';
 
-        if (isAnalyzing) {
-            return e('div', { className: 'text-center p-4 bg-white rounded-xl shadow-sm border border-gray-100' },
-                e('div', { className: 'flex flex-col items-center justify-center py-8' },
-                    e('div', { className: 'animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600' }),
-                    e('p', { className: 'mt-4 text-gray-600 font-medium' }, 'Analyzing your contract...')
-                )
-            );
-        }
+        content.innerHTML = `
+            <div class="space-y-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold">Contract Analysis</h1>
+                    <button class="text-gray-500 hover:text-gray-700" onclick="this.closest('.fixed').remove()">×</button>
+                </div>
+                ${analysisContent}
+            </div>
+        `;
 
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+    }
+
+    // Display risk analysis results
+    function displayRiskAnalysis(analysis) {
         if (!analysis) {
-            return e('div', { className: 'bg-gray-50 p-4 rounded-lg' },
-                e('p', { className: 'text-gray-600' }, 'No analysis available')
-            );
-        }
-
-        // Parse the analysis text
-        const parseSections = (text) => {
-            const sections = {
-                summary: '',
-                keyPoints: '',
-                suggestions: ''
-            };
-
-            const lines = text.split('\n');
-            let currentSection = null;
-
-            lines.forEach(line => {
-                if (line.includes('📋 Summary')) {
-                    currentSection = 'summary';
-                } else if (line.includes('🎯 Key Points')) {
-                    currentSection = 'keyPoints';
-                } else if (line.includes('💡 Suggestions')) {
-                    currentSection = 'suggestions';
-                } else if (currentSection && line.trim() && !line.startsWith('##')) {
-                    sections[currentSection] += line + '\n';
-                }
-            });
-
-            return sections;
-        };
-
-        const sections = parseSections(analysis);
-
-        // Format markdown text
-        const formatMarkdown = (text) => {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\[(.*?)\]/g, '<em>$1</em>')
-                .split('\n')
-                .filter(line => line.trim())
-                .map(line => {
-                    // Handle numbered lists
-                    if (/^\d+\./.test(line)) {
-                        return `<div class="flex space-x-3 mb-3">
-                            <span class="text-blue-600 font-bold">${line.match(/^\d+\./)[0]}</span>
-                            <span>${line.replace(/^\d+\./, '').trim()}</span>
-                        </div>`;
-                    }
-                    return `<p class="mb-3">${line}</p>`;
-                })
-                .join('');
-        };
-
-        return e('div', { className: 'space-y-8' },
-            // Header
-            e('div', { className: 'flex items-center justify-between mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100' },
-                e('div', { className: 'flex items-center space-x-4' },
-                    e('span', { className: 'text-3xl' }, '🤖'),
-                    e('div', null,
-                        e('h2', { className: 'text-2xl font-bold text-gray-900' }, 'AI Analysis'),
-                        e('p', { className: 'text-gray-600 mt-1' }, 'Powered by GPT-4')
-                    )
-                ),
-                e('button', {
-                    className: 'px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md',
-                    onClick: () => setShowRewritePrompt(true)
-                }, 'Rewrite Contract')
-            ),
-            
-            // Summary Section
-            e('div', { className: 'bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow' },
-                e('div', { className: 'flex items-center space-x-3 mb-6' },
-                    e('span', { className: 'text-2xl' }, '📋'),
-                    e('h3', { className: 'text-xl font-bold text-gray-900' }, 'Summary')
-                ),
-                e('div', {
-                    className: 'prose max-w-none text-gray-700 leading-relaxed',
-                    dangerouslySetInnerHTML: { __html: formatMarkdown(sections.summary.trim() || 'No summary available') }
-                })
-            ),
-
-            // Key Points Section
-            e('div', { className: 'bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow' },
-                e('div', { className: 'flex items-center space-x-3 mb-6' },
-                    e('span', { className: 'text-2xl' }, '🎯'),
-                    e('h3', { className: 'text-xl font-bold text-gray-900' }, 'Key Points')
-                ),
-                e('div', {
-                    className: 'prose max-w-none text-gray-700 leading-relaxed',
-                    dangerouslySetInnerHTML: { __html: formatMarkdown(sections.keyPoints.trim() || 'No key points available') }
-                })
-            ),
-
-            // Suggestions Section
-            sections.suggestions && e('div', { className: 'bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow' },
-                e('div', { className: 'flex items-center space-x-3 mb-6' },
-                    e('span', { className: 'text-2xl' }, '💡'),
-                    e('h3', { className: 'text-xl font-bold text-gray-900' }, 'Suggestions for Improvement')
-                ),
-                e('div', {
-                    className: 'prose max-w-none text-gray-700 leading-relaxed',
-                    dangerouslySetInnerHTML: { __html: formatMarkdown(sections.suggestions.trim()) }
-                })
-            ),
-
-            // Contract Preview Section
-            contract && e('div', { className: 'bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow' },
-                e('div', { className: 'flex items-center space-x-3 mb-6' },
-                    e('span', { className: 'text-2xl' }, '📄'),
-                    e('h3', { className: 'text-xl font-bold text-gray-900' }, 'Contract Preview')
-                ),
-                e('div', { className: 'prose max-w-none' },
-                    e('pre', { 
-                        className: 'bg-gray-50 p-6 rounded-lg text-sm text-gray-800 whitespace-pre-wrap leading-relaxed overflow-x-auto border border-gray-200'
-                    }, contract)
-                )
-            )
-        );
-    };
-
-    // Render navigation
-    const renderNavigation = () => {
-        const steps = [
-            { id: 'upload', label: 'Upload Document' },
-            { id: 'analyze', label: 'Review & Analyze' },
-            { id: 'signers', label: 'Add Signers' },
-            { id: 'send', label: 'Send for Signature' }
-        ];
-
-        const getCurrentStep = () => {
-            if (!contract) return 'upload';
-            if (!analysis) return 'analyze';
-            if (!signers || signers.length === 0) return 'signers';
-            return 'send';
-        };
-
-        const currentStep = getCurrentStep();
-
-        return e('nav', { className: 'flex justify-between mb-8 border-b border-gray-200' },
-            steps.map(step => {
-                const isActive = step.id === currentStep;
-                const isPast = steps.findIndex(s => s.id === step.id) < steps.findIndex(s => s.id === currentStep);
-                
-                return e('div', {
-                    key: step.id,
-                    className: `pb-4 px-6 ${isActive ? 'text-blue-600 border-b-2 border-blue-600' : isPast ? 'text-blue-600' : 'text-gray-500'}`
-                }, step.label);
-            })
-        );
-    };
-
-    // Load templates on mount
-    React.useEffect(() => {
-        fetch(`${API_BASE_URL}/api/templates`)
-            .then(response => response.json())
-            .catch(error => console.error('Error fetching templates:', error));
-    }, []);
-
-    // Trigger AI analysis when contract changes
-    React.useEffect(() => {
-        if (contract) {
-            handleAnalyze(contract);
-        }
-    }, [contract]);
-
-    // Handle rewrite request
-    const handleRewrite = async () => {
-        if (!rewritePrompt.trim() || isRewriting) {
-            setError('Please enter rewrite instructions');
+            alert('No analysis results received');
             return;
         }
 
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        };
+
+        const content = document.createElement('div');
+        content.className = 'bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto';
+        
+        const concerns = analysis.concerns || [];
+        
+        content.innerHTML = `
+            <div class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <img src="static/images/logo.png" alt="Logo" class="h-8 w-8">
+                        <h1 class="text-2xl font-bold">Risk Analysis Report</h1>
+                    </div>
+                    <button class="text-gray-500 hover:text-gray-700" onclick="this.closest('.fixed').remove()">×</button>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="flex items-center space-x-3">
+                        <h2 class="text-xl">Overall Risk Score:</h2>
+                        <span class="px-3 py-1 bg-green-500 text-white rounded-full">${analysis.risk_score || 'N/A'}/10</span>
+                    </div>
+                    <p class="mt-2 text-gray-700">${analysis.summary || 'No summary available.'}</p>
+                </div>
+
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold">Clause Analysis</h2>
+                    ${concerns.length > 0 ? concerns.map(concern => `
+                        <div class="p-4 rounded-lg ${getRiskLevelClass(concern.level)}">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-semibold">${concern.title || ''}</h3>
+                                <span class="px-2 py-1 rounded text-sm ${getRiskLevelTextClass(concern.level)}">${concern.level || 'UNKNOWN'}</span>
+                            </div>
+                            <p>${concern.description || ''}</p>
+                        </div>
+                    `).join('') : '<p>No concerns found.</p>'}
+                </div>
+            </div>
+        `;
+
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+    }
+
+    // Helper function for risk level styling
+    function getRiskLevelClass(level) {
+        if (!level) return 'bg-gray-50';
+        switch (level.toUpperCase()) {
+            case 'HIGH': return 'bg-red-50';
+            case 'MEDIUM': return 'bg-yellow-50';
+            case 'LOW': return 'bg-green-50';
+            default: return 'bg-gray-50';
+        }
+    }
+
+    function getRiskLevelTextClass(level) {
+        if (!level) return 'bg-gray-100 text-gray-800';
+        switch (level.toUpperCase()) {
+            case 'HIGH': return 'bg-red-100 text-red-800';
+            case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
+            case 'LOW': return 'bg-green-100 text-green-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    }
+
+    // Format analysis results helper
+    function formatAnalysisResults(analysis) {
+        return `
+            <div class="space-y-6">
+                ${analysis.sections ? analysis.sections.map(section => `
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold mb-4">${section.title}</h2>
+                        <div class="space-y-4">
+                            ${section.items.map(item => `
+                                <div class="ml-4">
+                                    <div class="text-blue-600">${item.title}</div>
+                                    ${item.description ? `<div class="text-gray-700 ml-4">${item.description}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('') : ''}
+            </div>
+        `;
+    }
+
+    // Make functions globally available
+    window.openRewriteModal = function() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+                <h3 class="text-xl font-bold mb-4">Rewrite Contract</h3>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Choose a rewrite option:
+                    </label>
+                    <div class="space-y-2">
+                        <button onclick="window.handleRewrite('Make it more concise')" 
+                            class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">
+                            Make it more concise
+                        </button>
+                        <button onclick="window.handleRewrite('Make it more formal')" 
+                            class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">
+                            Make it more formal
+                        </button>
+                        <button onclick="window.handleRewrite('Add more protection clauses')" 
+                            class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">
+                            Add more protection clauses
+                        </button>
+                        <button onclick="window.handleRewrite('Simplify language')" 
+                            class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">
+                            Simplify language
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Or provide custom instructions:
+                    </label>
+                    <textarea id="rewriteInstructions" 
+                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows="4"
+                        placeholder="Enter your specific requirements for the rewrite..."></textarea>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button onclick="this.closest('.fixed').remove()" 
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                        Cancel
+                    </button>
+                    <button onclick="window.handleRewrite(document.getElementById('rewriteInstructions').value)" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Rewrite
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    };
+
+    // Make rewrite handler globally available
+    window.handleRewrite = async function(instructions) {
+        if (!instructions || !instructions.trim()) {
+            alert('Please provide rewrite instructions');
+            return;
+        }
+
+        const textarea = document.getElementById('contractContent');
+        if (!textarea || !textarea.value.trim()) {
+            alert('Please enter contract content first');
+            return;
+        }
+        
         try {
-            setIsRewriting(true);
-            console.log('Sending rewrite request with:', {
-                content: contract,
-                instructions: rewritePrompt
+            console.log('Sending rewrite request:', {
+                instructions: instructions.trim(),
+                contentLength: textarea.value.trim().length
             });
 
             const response = await fetch(`${API_BASE_URL}/api/rewrite`, {
@@ -656,685 +629,288 @@ function App() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    content: contract,
-                    instructions: rewritePrompt
+                    content: textarea.value.trim(),
+                    instructions: instructions.trim()
                 })
             });
-
+            
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to rewrite contract');
+                const error = await response.json();
+                throw new Error(error.error || 'Rewrite failed');
             }
+            
+            const result = await response.json();
+            console.log('Rewrite response:', result);
+
+            if (!result || !result.rewritten) {
+                throw new Error('No rewritten text received');
+            }
+
+            textarea.value = result.rewritten;
+            
+            // Close the modal if it exists
+            const modal = document.querySelector('.fixed');
+            if (modal) modal.remove();
+            
+        } catch (err) {
+            console.error('Rewrite error:', err);
+            alert(`Failed to rewrite contract: ${err.message}`);
+        }
+    };
+
+    // Handle send signature button click
+    window.openSignatureModal = function() {
+        // Show signature options modal
+        const signatureModal = document.createElement('div');
+        signatureModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        signatureModal.innerHTML = `
+            <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+                <h3 class="text-xl font-bold mb-4">Send for Signature</h3>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Recipient Email
+                    </label>
+                    <input type="email" id="recipientEmail" class="w-full p-2 border rounded-lg" 
+                        placeholder="Enter recipient's email...">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Message (optional)
+                    </label>
+                    <textarea id="signatureMessage" class="w-full h-24 p-2 border rounded-lg" 
+                        placeholder="Add a message to the recipient..."></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button onclick="this.closest('.fixed').remove()" 
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                        Cancel
+                    </button>
+                    <button onclick="window.submitSignature()" 
+                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                        Send
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(signatureModal);
+    };
+
+    // Submit signature request
+    window.submitSignature = async function() {
+        const sendButton = document.querySelector('[onclick="window.submitSignature()"]');
+        if (sendButton.disabled) return; // Prevent multiple submissions
+        
+        const email = document.getElementById('recipientEmail').value;
+        const message = document.getElementById('signatureMessage').value;
+        const textarea = document.getElementById('contractContent');
+        
+        if (!email || !textarea || !textarea.value.trim()) {
+            alert('Please provide both recipient email and contract content');
+            return;
+        }
+        
+        try {
+            // Disable the button and show loading state
+            sendButton.disabled = true;
+            sendButton.innerHTML = 'Sending...';
+            
+            const response = await fetch(`${API_BASE_URL}/api/send`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contract: textarea.value.trim(), // Changed from text to contract
+                    signers: [{ email: email, name: email.split('@')[0] }],
+                    use_ai_positioning: true
+                })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to send signature request');
+            }
+            
+            const result = await response.json();
+            
+            // Close the modal
+            document.querySelector('.fixed').remove();
+            alert('Contract sent for signature successfully!');
+            
+        } catch (err) {
+            console.error('Signature error:', err);
+            alert(err.message || 'Failed to send signature request');
+            
+            // Re-enable the button on error
+            sendButton.disabled = false;
+            sendButton.innerHTML = 'Send';
+        }
+    };
+
+    // Format contract text for display
+    function formatContractText(text) {
+        // Remove excessive newlines while preserving paragraph breaks
+        let formatted = text
+            .replace(/\r\n/g, '\n') // Normalize line endings
+            .replace(/\n{3,}/g, '\n\n') // Replace multiple newlines with double newline
+            .replace(/([^\n])\n([^\n])/g, '$1 $2'); // Join single-line breaks with space
+        
+        return formatted;
+    }
+
+    // Update contract display
+    function updateContractDisplay(newText) {
+        const contractDisplay = document.getElementById('contractContent');
+        if (contractDisplay) {
+            contractDisplay.value = formatContractText(newText);
+        }
+    }
+
+    // Handle file upload
+    async function handleFileUpload(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) throw new Error('Upload failed');
 
             const result = await response.json();
-            if (result.error) {
-                throw new Error(result.error);
+            if (result.content) {
+                // Format the content before displaying
+                updateContractDisplay(result.content);
             }
-
-            setContract(result.rewritten);
-            setShowRewritePrompt(false);
-            setRewritePrompt('');
-            setError(null);
-        } catch (error) {
-            console.error('Rewrite error:', error);
-            setError(error.message);
-        } finally {
-            setIsRewriting(false);
+        } catch (err) {
+            console.error('Upload error:', err);
+            alert('Failed to upload file');
         }
-    };
-
-    const handleDrag = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.type === 'dragenter' || e.type === 'dragover') {
-            setDragActive(true);
-        } else if (e.type === 'dragleave') {
-            setDragActive(false);
-        }
-    };
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setDragActive(false);
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            handleFile(e.dataTransfer.files[0]);
-        }
-    };
-
-    const handleFileUpload = (event) => {
-        if (event.target.files && event.target.files[0]) {
-            handleFile(event.target.files[0]);
-        }
-    };
-
-    const handleFile = (file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            setContract(e.target.result);
-            setUploadedFile(file.name);
-        };
-        reader.readAsText(file);
-    };
-
-    const handlePaste = () => {
-        setShowPastePrompt(true);
-    };
-
-    const handlePasteSubmit = () => {
-        if (pasteContent) {
-            setContract(pasteContent);
-            setUploadedFile('Pasted Content');
-            setShowPastePrompt(false);
-            setPasteContent('');
-        }
-    };
-
-    const handlePasteCancel = () => {
-        setShowPastePrompt(false);
-        setPasteContent('');
-    };
-
-    const handleHelp = () => {
-        setShowHelp(true);
-    };
-
-    const handleSettings = () => {
-        setShowSettings(true);
-    };
-
-    const handleCloseModal = () => {
-        setShowHelp(false);
-        setShowSettings(false);
-    };
-
-    const handleAddSigner = () => {
-        setSigners([...signers, { name: '', email: '' }]);
-    };
-
-    const handleRemoveSigner = (index) => {
-        setSigners(signers.filter((_, i) => i !== index));
-    };
-
-    const handleSignerChange = (index, field, value) => {
-        const newSigners = [...signers];
-        newSigners[index][field] = value;
-        setSigners(newSigners);
-    };
-
-    // Risk Analysis Button Component
-    function RiskAnalysisButton({ onAnalyze }) {
-        return e('button', {
-            className: 'btn btn-warning ms-2',
-            onClick: onAnalyze,
-            title: 'Analyze contract risks'
-        }, '🔍 Risk Analysis');
     }
 
-    // Risk Analysis Modal Component
-    function RiskAnalysisModal({ isOpen, onClose, analysis }) {
-        if (!isOpen || !analysis) return null;
-
-        const getRiskColor = (level) => {
-            switch(level.toLowerCase()) {
-                case 'high':
-                    return 'bg-red-100 text-red-800 border-red-200';
-                case 'medium':
-                    return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-                case 'low':
-                    return 'bg-green-100 text-green-800 border-green-200';
-                default:
-                    return 'bg-gray-100 text-gray-800 border-gray-200';
-            }
-        };
-
-        const getRiskScoreColor = (score) => {
-            if (score >= 7) return 'bg-red-500';
-            if (score >= 4) return 'bg-yellow-500';
-            return 'bg-green-500';
-        };
-
-        return e('div', {
-            className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'
-        },
-            e('div', {
-                className: 'bg-white rounded-lg w-3/4 max-h-[90vh] overflow-y-auto p-6'
-            },
-                e('div', { className: 'flex justify-between items-center mb-6' },
-                    e('h2', { className: 'text-2xl font-bold' }, '📊 Risk Analysis Report'),
-                    e('button', {
-                        onClick: onClose,
-                        className: 'text-gray-500 hover:text-gray-700'
-                    }, '✕')
+    // Main render
+    return e('div', { className: 'min-h-screen bg-gradient-to-br from-blue-900 to-cyan-600' },
+        // Header
+        e('header', { className: 'bg-gradient-to-r from-blue-900 to-cyan-600 text-white py-4 px-6 shadow-lg' },
+            e('div', { className: 'container mx-auto flex justify-between items-center' },
+                e('div', { className: 'flex items-center space-x-2' },
+                    e('h1', { className: 'text-2xl font-bold' }, 'ContractIQ'),
+                    e('span', { className: 'text-sm text-cyan-200 ml-3' }, 'Intelligent Contract Management')
                 ),
-                e('div', { className: 'space-y-6' },
-                    // Overall Risk Score
-                    e('div', { className: 'mb-6' },
-                        e('div', { className: 'flex items-center gap-4' },
-                            e('h3', { className: 'text-xl font-semibold' }, 'Overall Risk Score:'),
-                            e('span', {
-                                className: `px-3 py-1 rounded-full text-white font-bold ${getRiskScoreColor(analysis.overall_risk_score)}`
-                            }, `${analysis.overall_risk_score}/10`)
-                        ),
-                        e('p', { className: 'mt-2 text-gray-700' }, analysis.risk_summary)
-                    ),
-                    
-                    // Clause Analysis
-                    e('div', { className: 'space-y-4' },
-                        e('h3', { className: 'text-xl font-semibold mb-4' }, 'Clause Analysis'),
-                        ...analysis.clauses.map((clause, index) =>
-                            e('div', {
-                                key: index,
-                                className: `p-4 rounded-lg border ${getRiskColor(clause.risk_level)}`
-                            },
-                                e('div', { className: 'flex justify-between items-start mb-2' },
-                                    e('h4', { className: 'font-semibold' }, clause.clause),
-                                    e('span', {
-                                        className: `px-2 py-1 rounded-md text-sm font-medium ${getRiskColor(clause.risk_level)}`
-                                    }, clause.risk_level.toUpperCase())
-                                ),
-                                e('p', { className: 'text-sm' }, clause.details)
-                            )
-                        )
-                    )
-                )
+                e('button', {
+                    className: 'bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors',
+                    onClick: () => setShowInviteModal(true)
+                }, 'Invite Collaborator')
             )
-        );
-    }
+        ),
 
-    // Success Modal Component
-    const SuccessModal = () => {
-        return e('div', {
-            className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50',
-            onClick: () => {
-                setShowSuccessModal(false);
-                // Reset state after closing modal
-                setContract('');
-                setSigners([{ name: '', email: '' }]);
-                setSignaturePositions([]);
-                setAnalysis(null);
-                setIsAnalyzing(false);
-                setShowRewritePrompt(false);
-                setRewritePrompt('');
-                setUploadedFile('');
-            }
-        },
-            e('div', {
-                className: 'bg-white rounded-lg p-8 max-w-md w-full mx-4 transform transition-all',
-                onClick: e => e.stopPropagation()
-            },
-                e('div', { className: 'text-center' },
-                    e('div', { className: 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4' },
-                        e('svg', {
-                            className: 'h-8 w-8 text-green-600',
-                            fill: 'none',
-                            viewBox: '0 0 24 24',
-                            stroke: 'currentColor'
+        // Main Content
+        e('main', { className: 'container mx-auto px-6 py-8' },
+            selectedTemplate
+                ? e('div', { className: 'bg-white rounded-lg shadow-lg p-6' },
+                    // Selected template view
+                    e('div', { className: 'flex justify-between items-center mb-6' },
+                        e('h2', { className: 'text-2xl font-bold text-gray-900' }, selectedTemplate.name),
+                        e('button', {
+                            className: 'text-blue-600 hover:text-blue-800 flex items-center space-x-2',
+                            onClick: () => setSelectedTemplate(null)
                         },
-                            e('path', {
-                                strokeLinecap: 'round',
-                                strokeLinejoin: 'round',
-                                strokeWidth: '2',
-                                d: 'M5 13l4 4L19 7'
-                            })
-                        )
-                    ),
-                    e('h3', { className: 'text-2xl leading-6 font-medium text-gray-900 mb-4' },
-                        'Document Sent Successfully!'
-                    ),
-                    e('div', { className: 'text-gray-600 mb-6' },
-                        e('p', { className: 'mb-2' },
-                            'Your document has been sent for signature. All parties will receive an email with instructions.'
-                        ),
-                        e('p', {},
-                            'You can track the signing progress in your DocuSign account.'
+                            e('span', null, '←'),
+                            e('span', null, 'Back to Templates')
                         )
                     ),
                     e('div', { className: 'mt-6' },
-                        e('button', {
-                            className: 'w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
-                            onClick: () => {
-                                setShowSuccessModal(false);
-                                // Reset state after closing modal
-                                setContract('');
-                                setSigners([{ name: '', email: '' }]);
-                                setSignaturePositions([]);
-                                setAnalysis(null);
-                                setIsAnalyzing(false);
-                                setShowRewritePrompt(false);
-                                setRewritePrompt('');
-                                setUploadedFile('');
-                            }
-                        }, 'Start New Document')
-                    )
-                )
-            )
-        );
-    };
-
-    const renderPositionSelector = () => {
-        if (!showPositionSelector) return null;
-        
-        return e('div', { className: 'position-selector' },
-            e('h3', null, 'Select Signature Positions'),
-            signers.map((signer, index) => 
-                e('div', { key: index, className: 'signer-position' },
-                    e('h4', null, signer.name || `Signer ${index + 1}`),
-                    signaturePositions[index] && e('div', { className: 'position-info' },
-                        e('p', null, 
-                            e('strong', null, 'Description:'), 
-                            ' ', 
-                            signaturePositions[index].description
-                        ),
-                        e('p', null, 
-                            e('strong', null, 'Location:'), 
-                            ' ', 
-                            signaturePositions[index].anchor_text
-                        ),
-                        e('p', null, 
-                            e('strong', null, 'Alignment:'), 
-                            ' ', 
-                            signaturePositions[index].align
-                        )
-                    )
-                )
-            )
-        );
-    };
-
-    const renderRewritePrompt = () => {
-        if (!showRewritePrompt) return null;
-
-        return e('div', {
-            className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'
-        },
-            e('div', { className: 'bg-white rounded-xl p-6 max-w-2xl w-full' },
-                e('div', { className: 'flex justify-between items-center mb-4' },
-                    e('h2', { className: 'text-xl font-semibold' }, 'Rewrite Contract'),
-                    e('button', {
-                        className: 'text-gray-500 hover:text-gray-700',
-                        onClick: () => setShowRewritePrompt(false)
-                    }, '×')
-                ),
-                e('p', { className: 'mb-4 text-gray-600' }, 
-                    'Enter your instructions for rewriting the contract. Be specific about what changes you want to make.'
-                ),
-                e('textarea', {
-                    className: 'w-full h-32 p-3 border rounded-lg mb-4',
-                    placeholder: 'Example: Make the language more formal and add a confidentiality clause',
-                    value: rewritePrompt,
-                    onChange: (e) => setRewritePrompt(e.target.value)
-                }),
-                e('div', { className: 'flex justify-end space-x-3' },
-                    e('button', {
-                        className: 'px-4 py-2 text-gray-600 border rounded hover:bg-gray-50',
-                        onClick: () => setShowRewritePrompt(false)
-                    }, 'Cancel'),
-                    e('button', {
-                        className: `px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 ${isRewriting ? 'opacity-50 cursor-not-allowed' : ''}`,
-                        onClick: handleRewrite,
-                        disabled: isRewriting
-                    }, isRewriting ? 'Rewriting...' : 'Rewrite')
-                )
-            )
-        );
-    };
-
-    const renderSettings = () => {
-        if (!showSettings) return null;
-
-        return e('div', {
-            className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'
-        },
-            e('div', { className: 'bg-white rounded-xl p-6 max-w-2xl w-full' },
-                e('div', { className: 'flex justify-between items-center mb-4' },
-                    e('h2', { className: 'text-xl font-semibold' }, 'Settings'),
-                    e('button', {
-                        className: 'text-gray-500 hover:text-gray-700',
-                        onClick: () => setShowSettings(false)
-                    }, '×')
-                ),
-                e('div', { className: 'space-y-4' },
-                    e('div', null,
-                        e('h3', { className: 'font-medium mb-2' }, 'API Configuration'),
-                        e('p', { className: 'text-sm text-gray-600 mb-2' }, 
-                            'Current API URL: ', API_BASE_URL
-                        )
-                    ),
-                    e('div', null,
-                        e('h3', { className: 'font-medium mb-2' }, 'Default Template'),
-                        e('select', {
-                            className: 'w-full p-2 border rounded',
-                            value: selectedTemplate?.id || '',
+                        e('textarea', {
+                            id: 'contractContent',
+                            className: 'w-full h-96 p-4 border rounded-lg font-mono text-sm',
+                            value: selectedTemplate ? selectedTemplate.content : '',
                             onChange: (e) => {
-                                const template = contractTemplates.find(t => t.id === parseInt(e.target.value));
-                                if (template) handleTemplateSelect(template);
-                            }
-                        },
-                            e('option', { value: '' }, 'Select a template'),
-                            contractTemplates.map(template =>
-                                e('option', { key: template.id, value: template.id }, template.name)
-                            )
-                        )
-                    )
-                ),
-                e('div', { className: 'flex justify-end mt-6' },
-                    e('button', {
-                        className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700',
-                        onClick: () => setShowSettings(false)
-                    }, 'Close')
-                )
-            )
-        );
-    };
-
-    const renderSigners = () => {
-        return e('div', { className: 'bg-white p-6 rounded-xl shadow-sm border border-gray-100' },
-            e('div', { className: 'flex items-center justify-between mb-6' },
-                e('h3', { className: 'text-xl font-bold text-gray-900' }, 'Signers'),
-                e('button', {
-                    className: 'text-blue-600 hover:text-blue-700 font-medium flex items-center',
-                    onClick: () => {
-                        setSigners([...signers, { name: '', email: '' }]);
-                    }
-                },
-                    e('span', { className: 'mr-2' }, '+'),
-                    'Add Signer'
-                )
-            ),
-            signers.map((signer, index) => (
-                e('div', { key: index, className: 'flex gap-4 mb-4' },
-                    e('input', {
-                        type: 'text',
-                        placeholder: 'Name',
-                        className: 'flex-1 p-2 border border-gray-300 rounded-lg',
-                        value: signer.name,
-                        onChange: (e) => {
-                            const newSigners = [...signers];
-                            newSigners[index].name = e.target.value;
-                            setSigners(newSigners);
-                        }
-                    }),
-                    e('input', {
-                        type: 'email',
-                        placeholder: 'Email',
-                        className: 'flex-1 p-2 border border-gray-300 rounded-lg',
-                        value: signer.email,
-                        onChange: (e) => {
-                            const newSigners = [...signers];
-                            newSigners[index].email = e.target.value;
-                            setSigners(newSigners);
-                        }
-                    }),
-                    e('button', {
-                        className: 'text-red-600 hover:text-red-700',
-                        onClick: () => {
-                            const newSigners = signers.filter((_, i) => i !== index);
-                            setSigners(newSigners);
-                        }
-                    }, '×')
-                )
-            )),
-            // Send for Signature button
-            signers.length > 0 && e('div', { className: 'mt-6 flex justify-end' },
-                e('button', {
-                    className: `px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md ${isSending ? 'opacity-50 cursor-not-allowed' : ''}`,
-                    onClick: handleSendContract,
-                    disabled: isSending
-                }, isSending ? 'Sending...' : 'Send for Signature')
-            )
-        );
-    };
-
-    // Contract View Component
-    function ContractView({ contract, onClose }) {
-        return e('div', { className: 'contract-view' },
-            e('div', { className: 'contract-header' },
-                e('h2', null, contract.title),
-                e('button', { onClick: onClose, className: 'close-btn' }, '×')
-            ),
-            e('div', { className: 'contract-content' }, contract.content),
-            e('div', { className: 'collaboration-section' },
-                e(InviteCollaborator, { 
-                    contractId: contract.id,
-                    onInviteSent: () => setRefreshKey(prev => prev + 1)
-                }),
-                e(CollaboratorsList, { 
-                    contractId: contract.id,
-                    key: refreshKey 
-                })
-            )
-        );
-    }
-
-    const Header = () => {
-        return e('div', { className: 'mb-8' },
-            e('div', { className: 'bg-blue-600 text-white p-4 text-center' },
-                e('h1', { className: 'text-2xl font-bold' }, 'ContractIQ'),
-                e('p', { className: 'text-sm mt-1' }, 'AI-Powered Contract Management')
-            ),
-            e('nav', { className: 'bg-white border-b' },
-                e('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8' },
-                    e('div', { className: 'flex justify-between h-16' },
-                        e('div', { className: 'flex-shrink-0 flex items-center' },
-                            e('img', {
-                                className: 'h-8 w-auto',
-                                src: 'static/images/ContractIQ.svg',
-                                alt: 'ContractIQ'
-                            })
-                        )
-                    ),
-                    e('div', { className: 'flex items-center' },
-                        e('button', {
-                            className: 'p-2 text-gray-600 hover:text-gray-800',
-                            onClick: () => setShowHelp(true)
-                        }, '?'),
-                        e('button', {
-                            className: 'p-2 ml-2 text-gray-600 hover:text-gray-800',
-                            onClick: () => setShowSettings(true)
-                        }, '⚙️')
-                    )
-                )
-            )
-        );
-    };
-
-    const renderContractActions = () => {
-        return e('div', { className: 'flex flex-wrap gap-2 mt-4' },
-            e('button', {
-                className: `px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : ''}`,
-                onClick: () => handleAnalyze(contract),
-                disabled: !contract || isAnalyzing
-            }, isAnalyzing ? 'Analyzing...' : 'Analyze Contract'),
-            e('button', {
-                className: `px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 ${isAnalyzingRisks ? 'opacity-50 cursor-not-allowed' : ''}`,
-                onClick: handleRiskAnalysis,
-                disabled: !contract || isAnalyzingRisks
-            }, isAnalyzingRisks ? 'Analyzing Risks...' : '🔍 Analyze Risks'),
-            e('button', {
-                className: `px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 ${isRewriting ? 'opacity-50 cursor-not-allowed' : ''}`,
-                onClick: () => setShowRewritePrompt(true),
-                disabled: !contract || isRewriting
-            }, isRewriting ? 'Rewriting...' : '✏️ Rewrite'),
-            e('button', {
-                className: `px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 ${isSending ? 'opacity-50 cursor-not-allowed' : ''}`,
-                onClick: handleSendContract,
-                disabled: !contract || isSending || signers.some(s => !s.email || !s.name)
-            }, isSending ? 'Sending...' : '📤 Send for Signature')
-        );
-    };
-
-    return e('div', { className: 'min-h-screen bg-gray-50' },
-        showSuccessModal && e(SuccessModal),
-        // Header
-        e(Header),
-        // Progress Steps
-        renderNavigation(),
-        // Main Content
-        e('div', { className: 'container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8' },
-            // Left Column - Templates
-            e('div', { className: 'lg:col-span-1' },
-                e(ContractTemplates, { onSelectTemplate: handleTemplateSelect })
-            ),
-
-            // Middle Column - Document Upload and Analysis
-            e('div', { className: 'lg:col-span-1' },
-                e('div', { className: 'bg-white p-6 rounded-xl shadow-md' },
-                    // Document Upload Section
-                    e('h2', { className: 'text-xl font-semibold mb-4' }, 'Document Upload'),
-                    uploadedFile && e('div', { className: 'mb-4 text-green-600' },
-                        'File loaded: ', uploadedFile
-                    ),
-                    
-                    // Upload Area
-                    !uploadedFile && e('div', {
-                        className: `upload-area rounded-lg p-8 text-center ${dragActive ? 'drag-active' : ''}`,
-                        onDragEnter: handleDrag,
-                        onDragLeave: handleDrag,
-                        onDragOver: handleDrag,
-                        onDrop: handleDrop
-                    },
-                        e('div', { key: 'upload-prompt' },
-                            e('p', { className: 'text-gray-600 mb-4' },
-                                'Drag and drop your document here, or ',
-                                e('button', {
-                                    className: 'text-blue-600 hover:text-blue-700',
-                                    onClick: () => fileInputRef.current.click()
-                                }, 'browse'),
-                                ' to upload'
+                                setSelectedTemplate({
+                                    ...selectedTemplate,
+                                    content: e.target.value
+                                });
+                            },
+                            placeholder: 'Select a template or paste your contract here...'
+                        }),
+                        e('div', { className: 'mt-4 flex space-x-4' },
+                            e('button', {
+                                className: 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center space-x-2',
+                                onClick: () => handleContractAnalysis(selectedTemplate?.content || '')
+                            },
+                                e('span', { className: 'text-xl' }, '🔍'),
+                                e('span', null, 'Analyze Contract')
                             ),
-                            e('input', {
-                                type: 'file',
-                                ref: fileInputRef,
-                                onChange: handleFileUpload,
-                                className: 'hidden'
-                            })
-                        ),
-                        e('div', { key: 'divider', className: 'my-4 flex items-center justify-center' },
-                            e('span', { className: 'text-gray-400' }, 'or')
-                        ),
-                        e('button', {
-                            key: 'paste-button',
-                            className: 'flex items-center justify-center mx-auto text-gray-600 hover:text-gray-700',
-                            onClick: handlePaste
-                        },
-                            e('svg', { className: 'w-5 h-5 mr-2', fill: 'currentColor', viewBox: '0 0 20 20' },
-                                e('path', { d: 'M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z' }),
-                                e('path', { d: 'M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z' })
+                            e('button', {
+                                className: 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center space-x-2',
+                                onClick: () => handleRiskAnalysis(selectedTemplate?.content || '')
+                            },
+                                e('span', { className: 'text-xl' }, '⚠️'),
+                                e('span', null, 'Analyze Risk')
                             ),
-                            'Paste Content'
-                        )
-                    )
-                ),
-
-                // Analysis Section
-                contract && e('div', { className: 'bg-blue-50 p-6 rounded-xl mt-6' },
-                    e('div', { className: 'flex items-center justify-between mb-4' },
-                        e('div', { className: 'flex items-center gap-3' },
-                            e('div', null,
-                                e('h3', { className: 'text-lg font-semibold' }, 'AI Analysis'),
-                                e('p', { className: 'text-sm text-gray-600' }, 'Powered by GPT-4')
+                            e('button', {
+                                className: 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center space-x-2',
+                                onClick: () => window.openRewriteModal()
+                            },
+                                e('span', { className: 'text-xl' }, '✍️'),
+                                e('span', null, 'Rewrite')
+                            ),
+                            e('button', {
+                                className: 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center space-x-2',
+                                onClick: () => window.openSignatureModal()
+                            },
+                                e('span', { className: 'text-xl' }, '✉️'),
+                                e('span', null, 'Send for Signature')
                             )
                         )
                     ),
-                    renderContractActions(),
-                    analysis && e('div', { className: 'mt-4' }, renderAnalysis())
                 )
-            ),
-
-            // Right Column - Contract Preview and Signers
-            e('div', { className: 'lg:col-span-1' },
-                contract && e('div', { className: 'bg-white p-6 rounded-xl shadow-md' },
-                    e('h2', { className: 'text-xl font-semibold mb-4' }, 'Contract Preview'),
-                    e('textarea', {
-                        ref: textareaRef,
-                        value: contract,
-                        onChange: e => setContract(e.target.value),
-                        className: 'w-full h-64 p-4 border rounded-lg font-mono text-sm',
-                        spellCheck: false
-                    })
-                ),
-                renderSigners(),
-                renderPositionSelector()
-            )
-        ),
-
-        // Help Modal
-        showHelp && e('div', { className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4' },
-            e('div', { className: 'bg-white rounded-xl p-6 max-w-2xl w-full' },
-                e('div', { className: 'flex justify-between items-center mb-4' },
-                    e('h2', { className: 'text-xl font-semibold' }, 'Help'),
-                    e('button', { onClick: handleCloseModal }, '×')
-                ),
-                e('div', { className: 'prose' },
-                    e('h3', null, 'Getting Started'),
-                    e('p', null, 'Welcome to ContractIQ! Here\'s how to get started:'),
-                    e('ol', null,
-                        e('li', null, 'Upload a document by dragging and dropping it into the upload area, or click "browse" to select a file.'),
-                        e('li', null, 'Alternatively, use one of our pre-made contract templates by selecting it from the templates section.'),
-                        e('li', null, 'Review your contract in the preview section and make any necessary changes.'),
-                        e('li', null, 'Add signers by clicking the "Add Signer" button and entering their details.'),
-                        e('li', null, 'Send the contract for signatures when ready.')
-                    ),
-                    e('h3', null, 'Features'),
-                    e('ul', null,
-                        e('li', null, 'Drag and drop file upload'),
-                        e('li', null, 'Contract templates'),
-                        e('li', null, 'Contract preview and editing'),
-                        e('li', null, 'Multiple signers support'),
-                        e('li', null, 'Secure electronic signatures')
+                : e('div', null,
+                    e('h2', { className: 'text-3xl font-bold text-white mb-8' }, 'Contract Templates'),
+                    e('div', { className: 'grid gap-6 md:grid-cols-2 lg:grid-cols-3' },
+                        // Custom Template Card
+                        e(CustomTemplateCard, {
+                            onClick: () => setShowCustomModal(true)
+                        }),
+                        // Standard Templates
+                        templates.map(template =>
+                            e(TemplateCard, {
+                                key: template.id,
+                                template,
+                                onSelect: handleTemplateSelect,
+                                isSelected: selectedTemplate?.id === template.id
+                            })
+                        )
                     )
                 )
-            )
         ),
 
-        // Settings Modal
-        showSettings && renderSettings(),
+        // Modals
+        e(CustomContractModal, {
+            isOpen: showCustomModal,
+            onClose: () => setShowCustomModal(false)
+        }),
 
-        // Paste Content Modal
-        showPastePrompt && e('div', { className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4' },
-            e('div', { className: 'bg-white rounded-xl p-6 max-w-2xl w-full' },
-                e('div', { className: 'flex justify-between items-center mb-4' },
-                    e('h2', { className: 'text-xl font-semibold' }, 'Paste Contract Content'),
-                    e('button', {
-                        className: 'text-gray-500 hover:text-gray-700',
-                        onClick: handlePasteCancel
-                    }, '×')
-                ),
-                e('textarea', {
-                    className: 'w-full h-64 p-4 border rounded-lg mb-4',
-                    placeholder: 'Paste your contract content here...',
-                    value: pasteContent,
-                    onChange: (e) => setPasteContent(e.target.value)
-                }),
-                e('div', { className: 'flex justify-end space-x-4' },
-                    e('button', {
-                        className: 'px-4 py-2 text-gray-600 hover:text-gray-800',
-                        onClick: handlePasteCancel
-                    }, 'Cancel'),
-                    e('button', {
-                        className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700',
-                        onClick: handlePasteSubmit,
-                        disabled: !pasteContent
-                    }, 'Submit')
-                )
+        // Loading Overlay
+        isAnalyzing && e('div', { 
+            className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50' 
+        },
+            e('div', { className: 'bg-white rounded-lg p-6 text-center' },
+                e('div', { className: 'animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4' }),
+                e('p', { className: 'text-lg font-semibold' }, 'Analyzing your contract...')
             )
-        ),
-
-        renderRewritePrompt(),
-        showRiskAnalysis && e(RiskAnalysisModal, {
-            isOpen: showRiskAnalysis,
-            onClose: handleCloseRiskAnalysis,
-            analysis: riskAnalysis
-        })
+        )
     );
 }
 
+// Export App to window
+window.App = App;
+
 // Initialize the app
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
     const rootElement = document.getElementById('root');
     if (rootElement) {
-        const app = e(App);
-        ReactDOM.render(app, rootElement);
+        ReactDOM.render(e(App), rootElement);
     }
 });

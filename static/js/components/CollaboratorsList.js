@@ -23,24 +23,24 @@ function CollaboratorsList({ contractId }) {
     }, [contractId]);
 
     if (isLoading) {
-        return e('div', null, 'Loading collaborators...');
+        return React.createElement('div', null, 'Loading collaborators...');
     }
 
     if (error) {
-        return e('div', { className: 'error' }, error);
+        return React.createElement('div', { className: 'error' }, error);
     }
 
-    return e('div', { className: 'collaborators-list' },
-        e('h3', null, 'Collaborators'),
-        e('div', { className: 'invitations' },
+    return React.createElement('div', { className: 'collaborators-list' },
+        React.createElement('h3', null, 'Collaborators'),
+        React.createElement('div', { className: 'invitations' },
             invitations.map(invitation => 
-                e('div', { key: invitation.id, className: 'invitation-item' },
-                    e('div', { className: 'invitation-email' }, invitation.email),
-                    e('div', { className: 'invitation-role' }, `Role: ${invitation.role}`),
-                    e('div', { className: 'invitation-status' }, 
+                React.createElement('div', { key: invitation.id, className: 'invitation-item' },
+                    React.createElement('div', { className: 'invitation-email' }, invitation.email),
+                    React.createElement('div', { className: 'invitation-role' }, `Role: ${invitation.role}`),
+                    React.createElement('div', { className: 'invitation-status' }, 
                         `Status: ${invitation.status}`,
                         invitation.status === 'pending' && 
-                        e('span', { className: 'expires' }, 
+                        React.createElement('span', { className: 'expires' }, 
                             ` (Expires: ${new Date(invitation.expires_at).toLocaleDateString()})`
                         )
                     )
@@ -49,3 +49,5 @@ function CollaboratorsList({ contractId }) {
         )
     );
 }
+
+window.CollaboratorsList = CollaboratorsList;

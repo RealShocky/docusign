@@ -1,5 +1,6 @@
 import openai
 import json
+import os
 from typing import Dict, Any
 
 class LanguageService:
@@ -9,8 +10,9 @@ class LanguageService:
     def simplify_contract(self, contract_text: str) -> Dict[str, Any]:
         """Convert legal language to plain English"""
         try:
+            model = os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview')
             response = openai.ChatCompletion.create(
-                model="gpt-4-1106-preview",
+                model=model,
                 messages=[
                     {"role": "system", "content": """You are a legal language simplification expert. 
                     Your task is to:

@@ -1,5 +1,6 @@
 import openai
 import json
+import os
 from typing import List, Dict, Any
 
 class RiskService:
@@ -11,10 +12,11 @@ class RiskService:
         }
 
     def analyze_contract_risks(self, contract_text: str) -> Dict[str, Any]:
-        """Analyze contract for potential risks using GPT-4"""
+        """Analyze contract for potential risks using GPT"""
         try:
+            model = os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview')
             response = openai.ChatCompletion.create(
-                model="gpt-4-1106-preview",
+                model=model,
                 messages=[
                     {"role": "system", "content": """You are a legal risk analysis expert. Analyze the contract for potential risks and issues.
                     For each clause or section:

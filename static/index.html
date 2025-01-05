@@ -67,6 +67,57 @@
         .btn-primary:hover {
             background-color: var(--secondary-color);
         }
+
+        /* Risk Analysis Styles */
+        .risk-analysis-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .risk-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid;
+        }
+
+        .risk-score {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            line-height: 2rem;
+            text-align: center;
+            border-radius: 9999px;
+            color: white;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            border-top-color: #3498db;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+
+        @-webkit-keyframes spinner {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -86,6 +137,15 @@
             <div id="root"></div>
         </div>
     </div>
+
+    <!-- Load React Components -->
+    <script src="js/components/InviteCollaborator.js"></script>
+    <script src="js/components/CollaboratorsList.js"></script>
+    <script src="js/components/TemplateCard.js"></script>
+    <script src="js/components/ContractTemplates.js"></script>
+    <script src="js/components/Header.js"></script>
+    
+    <!-- Load Main App -->
     <script src="js/app.js"></script>
 </body>
 </html>

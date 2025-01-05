@@ -1,62 +1,75 @@
-from flask import Flask, request, jsonify, session, send_from_directory
+from flask import Flask, request, jsonify, session, send_file
 from flask_cors import CORS
-from flask_session import Session
+from pdf_processor import process_file
 import os
+import openai
+import json
+from docusign_esign import ApiClient, EnvelopesApi, EnvelopeDefinition, Document, Signer, SignHere, Tabs, Text, DateSigned, Recipients
+import base64
+from fpdf import FPDF
+import traceback
 from dotenv import load_dotenv, find_dotenv
-import tempfile
+from flask_session import Session
 from database import init_db, Session as DBSession
-from services.file_service import FileService
-from services.template_service import TemplateService
-from services.collaboration_service import CollaborationService
 from services.ai_service import AIService
 from services.invitation_service import InvitationService
-from models import User, Contract, Template
-import openai
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from docusign_esign import ApiClient, EnvelopesApi, EnvelopeDefinition, Document, Signer, SignHere, Tabs, Recipients, Text
-import base64
+from typing import Dict, Any
+import PyPDF2
+import pdfplumber
 import jwt
 import time
-from fpdf import FPDF
-import json
-import pdfplumber
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import tempfile
 import os
-from typing import Dict, List, Any
+
+# Load environment variables
+load_dotenv()
 
 # Debug: Print current working directory
 print("Current working directory:", os.getcwd())
 
-# Load environment variables from .env file
-load_dotenv()
+# Initialize Flask app
+app = Flask(__name__, static_folder='static', static_url_path='')
+CORS(app)
 
-# Force clear any existing API key
-if 'OPENAI_API_KEY' in os.environ:
-    del os.environ['OPENAI_API_KEY']
-    print("Cleared existing OPENAI_API_KEY from environment")
+# Configure Flask-Session
+app.config['SESSION_TYPE'] = 'null'  # Use memory-based sessions instead of filesystem
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-here')
+Session(app)
+
+# Initialize database
+init_db()
+
+# Configure OpenAI
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
+# DocuSign configuration
+app.config.update(
+    DOCUSIGN_INTEGRATION_KEY=os.getenv('DOCUSIGN_INTEGRATION_KEY'),
+    DOCUSIGN_USER_ID=os.getenv('DOCUSIGN_USER_ID'),
+    DOCUSIGN_ACCOUNT_ID=os.getenv('DOCUSIGN_ACCOUNT_ID'),
+    DOCUSIGN_PRIVATE_KEY_PATH='private.key',
+    DOCUSIGN_AUTH_SERVER='account-d.docusign.com'
+)
+
+# Initialize services
+upload_folder = os.path.join(os.path.dirname(__file__), 'uploads')
+os.makedirs(upload_folder, exist_ok=True)
+ai_service = AIService()
+invitation_service = InvitationService(DBSession())
 
 # Debug: Find all .env files
 print("Looking for .env files...")
 env_file = find_dotenv()
 print("Found .env file:", env_file)
 
-# Load environment variables
-load_dotenv(override=True)  # Add override=True to force override existing env vars
-
 # Debug: Print environment sources
 print("\nAPI Key Sources:")
 print("1. From os.environ:", os.environ.get('OPENAI_API_KEY', 'Not found in os.environ'))
 print("2. From os.getenv:", os.getenv('OPENAI_API_KEY', 'Not found in getenv'))
 print("3. Direct from openai.api_key:", getattr(openai, 'api_key', 'Not set in openai'))
-
-# Configure OpenAI - Force set from .env file
-with open('.env', 'r') as f:
-    for line in f:
-        if line.startswith('OPENAI_API_KEY='):
-            openai.api_key = line.split('=', 1)[1].strip()
-            print("Set API key directly from .env file")
-            break
 
 # Debug: Print final OpenAI key
 print("4. Final OpenAI API Key:", openai.api_key[:10] + '...' if openai.api_key else 'Not set')
@@ -65,39 +78,6 @@ print("4. Final OpenAI API Key:", openai.api_key[:10] + '...' if openai.api_key 
 print("Environment variables loaded:")
 print("OPENAI_API_KEY:", os.getenv('OPENAI_API_KEY', 'Not found'))
 print("FLASK_ENV:", os.getenv('FLASK_ENV', 'Not found'))
-
-app = Flask(__name__, static_folder='static', static_url_path='')
-CORS(app, resources={
-    r"/*": {
-        "origins": ["http://localhost:5000", "http://localhost", "https://vibrationrobotics.com", "http://vibrationrobotics.com"],
-        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"]
-    }
-})
-
-# Session configuration
-app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-here')
-app.config['SESSION_TYPE'] = 'null'  # Use memory-based sessions instead of filesystem
-Session(app)
-
-# Initialize database
-init_db()
-
-# Initialize services
-upload_folder = os.path.join(os.path.dirname(__file__), 'uploads')
-os.makedirs(upload_folder, exist_ok=True)
-file_service = FileService(upload_folder)
-ai_service = AIService()
-invitation_service = InvitationService(DBSession())
-
-# DocuSign Configuration
-app.config.update(
-    DOCUSIGN_INTEGRATION_KEY=os.getenv('DOCUSIGN_INTEGRATION_KEY'),
-    DOCUSIGN_USER_ID=os.getenv('DOCUSIGN_USER_ID'),
-    DOCUSIGN_ACCOUNT_ID=os.getenv('DOCUSIGN_ACCOUNT_ID'),
-    DOCUSIGN_PRIVATE_KEY_PATH='private.key',
-    DOCUSIGN_AUTH_SERVER='account-d.docusign.com'
-)
 
 def get_jwt_token():
     try:
@@ -175,19 +155,19 @@ def get_db():
 
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html')
+    return send_file('static/index.html')
 
 @app.route('/js/<path:path>')
 def serve_js(path):
-    return send_from_directory('static/js', path)
+    return send_file('static/js/' + path)
 
 @app.route('/js/components/<path:path>')
 def serve_components(path):
-    return send_from_directory('static/js/components', path)
+    return send_file('static/js/components/' + path)
 
 @app.route('/callback')
 def callback():
-    return send_from_directory('static', 'callback.html')
+    return send_file('static/callback.html')
 
 # API routes start with /api
 @app.route('/api/auth/docusign-config')
@@ -211,65 +191,250 @@ def upload_contract():
         return jsonify({"error": "No file selected"}), 400
 
     try:
-        text = file_service.process_file(file)
+        text = process_file(file)
         return jsonify({"text": text})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@app.route('/api/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+
+    try:
+        # Read file bytes
+        file_bytes = file.read()
+        
+        # Process file based on type
+        content = process_file(file_bytes, file.filename)
+        
+        if content is None:
+            return jsonify({'error': 'Could not process file'}), 400
+
+        return jsonify({'content': content})
+    except Exception as e:
+        print("Error processing file:", str(e))
+        print(traceback.format_exc())
+        return jsonify({'error': f'Failed to process file: {str(e)}'}), 500
+
 @app.route('/api/analyze', methods=['POST'])
 def analyze_contract():
+    if not request.json or 'content' not in request.json:
+        return jsonify({"error": "No content provided"}), 400
+
+    try:
+        content = request.json['content']
+        
+        # Get model from environment variable or use default
+        model = os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview')
+        
+        response = openai.ChatCompletion.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": """You are a legal expert analyzing contracts. 
+                For each contract, provide a structured analysis with the following sections:
+
+                1. Key Terms and Definitions
+                2. Obligations and Responsibilities
+                3. Termination and Duration
+                4. Legal Compliance
+                5. Recommendations
+
+                For each section, provide specific items in this format:
+                SECTION NAME:
+                - Item Title: Detailed description of the item
+                - Another Item: Its description"""},
+                {"role": "user", "content": f"Analyze this contract and provide a structured analysis with the sections and items as specified:\n\n{content}"}
+            ],
+            temperature=0.7,
+            max_tokens=2000
+        )
+        
+        # Extract the analysis from the response
+        analysis = response.choices[0].message['content']
+        print("Raw analysis:", analysis)  # Debug print
+        
+        # Parse the analysis into structured sections
+        sections = []
+        current_section = None
+        current_items = []
+        
+        lines = analysis.split('\n')
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            
+            # Check if this is a section header (ends with : and is not an item)
+            if line.endswith(':') and not line.startswith('-'):
+                # Save previous section if it exists
+                if current_section and current_items:
+                    sections.append({
+                        'title': current_section,
+                        'items': current_items
+                    })
+                current_section = line.rstrip(':')
+                current_items = []
+            
+            # Check if this is an item (starts with -)
+            elif line.startswith('-'):
+                item_text = line[1:].strip()
+                if ':' in item_text:
+                    title, desc = item_text.split(':', 1)
+                    current_items.append({
+                        'title': title.strip(),
+                        'description': desc.strip()
+                    })
+                else:
+                    current_items.append({
+                        'title': item_text,
+                        'description': ''
+                    })
+        
+        # Add the last section
+        if current_section and current_items:
+            sections.append({
+                'title': current_section,
+                'items': current_items
+            })
+        
+        # If no sections were found, create a default section
+        if not sections:
+            sections = [{
+                'title': 'Contract Analysis',
+                'items': [{
+                    'title': 'General Analysis',
+                    'description': analysis
+                }]
+            }]
+        
+        print("Structured sections:", sections)  # Debug print
+        return jsonify({'sections': sections})
+
+    except Exception as e:
+        print(f"Error in analyze_contract: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/analyze-signature-positions', methods=['POST'])
+def analyze_signature_positions():
     if not request.json or 'content' not in request.json:
         return jsonify({"error": "No contract text provided"}), 400
     
     try:
         contract_text = request.json['content']
         
-        # Use OpenAI for analysis
+        # Use OpenAI for signature placement analysis
         response = openai.ChatCompletion.create(
             model="gpt-4-1106-preview",
             messages=[
-                {"role": "system", "content": """You are a legal contract analysis assistant. Analyze the contract and provide a detailed analysis in the following format:
-
-## 📋 Summary
-[Provide a clear, concise summary of the contract's purpose and main points in a professional tone]
-
-## 🎯 Key Points
-[List each key point with proper markdown formatting. Use bold for headers and explain each point clearly]
-
-1. **Parties Involved**: [Details]
-2. **Purpose**: [Details]
-3. **Terms**: [Details]
-[Continue with other relevant points...]
-
-## 💡 Suggestions for Improvement
-[Provide specific, actionable suggestions in a clear format]
-
-1. **[Suggestion Title]**: [Detailed explanation]
-2. **[Suggestion Title]**: [Detailed explanation]
-[Continue with other suggestions...]
-
-Note: Use proper markdown formatting:
-- Bold (**) for important terms
-- Lists for better readability
-- Clear section breaks
-- Professional tone throughout"""},
-                {"role": "user", "content": f"Please analyze this contract:\n\n{contract_text}"}
+                {"role": "system", "content": """You are a legal document analysis assistant specialized in determining optimal signature placements.
+                Analyze the contract and identify the most appropriate locations for signatures based on:
+                1. Standard signature conventions
+                2. Legal requirements
+                3. Document structure and formatting
+                4. Number of signers
+                
+                Return a JSON array where each item contains:
+                {
+                    "description": "Detailed explanation of why this is a good signature location",
+                    "anchor_text": "The text that precedes or indicates where the signature should go",
+                    "offset_type": "before" or "after" (relative to anchor_text),
+                    "align": "left", "right", or "center",
+                    "signer_role": "The role of who should sign here (e.g., 'client', 'company', etc.)"
+                }"""},
+                {"role": "user", "content": f"Analyze this contract and determine optimal signature positions:\n\n{contract_text}"}
             ],
             temperature=0.7
         )
         
-        analysis = response.choices[0].message['content']
+        # Extract the suggestions
+        suggestions = response.choices[0].message['content']
         
         return jsonify({
-            "analysis": analysis,
-            "success": True
+            "success": True,
+            "positions": suggestions
         })
         
     except Exception as e:
-        print("\nError occurred during analysis:")
-        print("Current API Key:", openai.api_key[:10] + '...' if openai.api_key else 'Not set')
-        print("Error details:", str(e))
-        return jsonify({"error": f"Analysis failed: {str(e)}"}), 500
+        print(f"Error analyzing signature positions: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/analyze/risks', methods=['POST'])
+def analyze_risks():
+    if not request.json or 'content' not in request.json:
+        return jsonify({"error": "No contract text provided"}), 400
+    
+    try:
+        contract_text = request.json['content']
+        
+        # Get model from environment variable or use default
+        model = os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview')
+        
+        response = openai.ChatCompletion.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": """You are a legal expert analyzing contract risks.
+                Provide a risk analysis with:
+                1. Overall risk score (1-10)
+                2. Summary of key risks
+                3. Detailed analysis of concerning clauses
+                
+                Format the response as:
+                RISK_SCORE: [1-10]
+                SUMMARY: [brief overview of risks]
+                CONCERNS:
+                - [concern title] | [risk level: HIGH/MEDIUM/LOW] | [description]"""},
+                {"role": "user", "content": f"Analyze the risks in this contract:\n\n{contract_text}"}
+            ],
+            temperature=0.7,
+            max_tokens=2000
+        )
+        
+        # Extract the analysis from the response
+        analysis = response.choices[0].message['content']
+        
+        # Parse the response into structured format
+        lines = analysis.split('\n')
+        result = {
+            'risk_score': None,
+            'summary': '',
+            'concerns': []
+        }
+        
+        current_section = None
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+                
+            if line.startswith('RISK_SCORE:'):
+                score = line.split(':', 1)[1].strip()
+                try:
+                    result['risk_score'] = int(score)
+                except:
+                    result['risk_score'] = 5  # default score
+            elif line.startswith('SUMMARY:'):
+                result['summary'] = line.split(':', 1)[1].strip()
+            elif line.startswith('-'):
+                parts = line[1:].split('|')
+                if len(parts) >= 3:
+                    result['concerns'].append({
+                        'title': parts[0].strip(),
+                        'level': parts[1].strip(),
+                        'description': parts[2].strip()
+                    })
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        print(f"Error in risk analysis endpoint: {str(e)}")
+        return jsonify({"error": f"Risk analysis failed: {str(e)}"}), 500
 
 @app.route('/api/rewrite', methods=['POST'])
 def rewrite_contract():
@@ -315,7 +480,7 @@ Original Contract:
         print(f"New length: {len(rewritten)} characters")
         
         return jsonify({
-            "rewritten": rewritten,
+            "rewritten_text": rewritten,  # Changed from "rewritten" to "rewritten_text"
             "success": True
         })
         
@@ -540,155 +705,22 @@ def compare_versions(contract_id):
         
     return jsonify(comparison)
 
-@app.route('/api/analyze-signature-positions', methods=['POST'])
-def analyze_signature_positions():
-    if not request.json or 'content' not in request.json:
-        return jsonify({"error": "No contract text provided"}), 400
-    
-    try:
-        contract_text = request.json['content']
-        
-        # Use OpenAI for signature placement analysis
-        response = openai.ChatCompletion.create(
-            model="gpt-4-1106-preview",
-            messages=[
-                {"role": "system", "content": """You are a legal document analysis assistant specialized in determining optimal signature placements.
-                Analyze the contract and identify the most appropriate locations for signatures based on:
-                1. Standard signature conventions
-                2. Legal requirements
-                3. Document structure and formatting
-                4. Number of signers
-                
-                Return a JSON array where each item contains:
-                {
-                    "description": "Detailed explanation of why this is a good signature location",
-                    "anchor_text": "The text that precedes or indicates where the signature should go",
-                    "offset_type": "before" or "after" (relative to anchor_text),
-                    "align": "left", "right", or "center",
-                    "signer_role": "The role of who should sign here (e.g., 'client', 'company', etc.)"
-                }"""},
-                {"role": "user", "content": f"Analyze this contract and determine optimal signature positions:\n\n{contract_text}"}
-            ],
-            temperature=0.7
-        )
-        
-        # Extract the suggestions
-        suggestions = response.choices[0].message['content']
-        
-        return jsonify({
-            "success": True,
-            "positions": suggestions
-        })
-        
-    except Exception as e:
-        print(f"Error analyzing signature positions: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
-def analyze_signature_locations(contract_text):
-    """Use GPT to find exact signature locations in the contract"""
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4-1106-preview",
-            messages=[
-                {"role": "system", "content": """You are an expert at analyzing legal documents for signature placements.
-                Look for these common signature patterns:
-                
-                1. Basic signature line:
-                   By: ____________________
-                
-                2. Role-based signatures with labels like:
-                   - [PARTY A] / [PARTY B]
-                   - [SERVICE PROVIDER] / [CLIENT]
-                   - [COMPANY] / [EMPLOYEE]
-                   - [SELLER] / [BUYER]
-                   
-                3. Additional fields like:
-                   Name:
-                   Title:
-                   Date:
-                
-                For each signature location found, determine:
-                1. The role (e.g., "provider", "client", "party_a", "party_b", "company", "employee", "seller", "buyer")
-                2. The exact anchor text ("By: ___" or similar)
-                3. Any additional context (role label above the signature)
-                4. Whether it's a primary or secondary signer
-                
-                Return a JSON array of signature locations, each containing:
-                {
-                    "role": "The signer role (e.g., provider, client)",
-                    "anchor_text": "The exact text that precedes the signature line",
-                    "context": "The role label or surrounding text",
-                    "is_primary": true/false,
-                    "additional_fields": ["Name", "Title", "Date"] (if present)
-                }"""},
-                {"role": "user", "content": f"Find all signature locations in this contract:\n\n{contract_text}"}
-            ],
-            temperature=0
-        )
-        
-        locations = json.loads(response.choices[0].message['content'])
-        print("AI found signature locations:", locations)
-        return locations
-    except Exception as e:
-        print(f"Error analyzing signature locations: {str(e)}")
-        return None
-
-def find_text_position_in_pdf(pdf_content, search_text):
-    """Find the y-coordinate of specific text in the PDF"""
-    try:
-        print(f"Looking for text: '{search_text}' in PDF...")
-        # Create a temporary PDF file
-        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_file:
-            tmp_file.write(pdf_content)
-            tmp_file.flush()
-            print(f"Created temporary PDF file: {tmp_file.name}")
-            
-            # Extract text and positions using pdfplumber
-            with pdfplumber.open(tmp_file.name) as pdf:
-                print("Opened PDF with pdfplumber")
-                page = pdf.pages[0]  # Assume signatures are on first page
-                words = page.extract_words(x_tolerance=3, y_tolerance=3)
-                print(f"Found {len(words)} words on page")
-                
-                # Look for the search text
-                for word in words:
-                    if search_text.lower() in word['text'].lower():
-                        print(f"Found match at: x={word['x0']}, y={word['y0']}")
-                        # Return position, converting from PDF coordinates
-                        return {
-                            'x': word['x0'],
-                            'y': word['y0'],
-                            'page': 1
-                        }
-                print(f"Text '{search_text}' not found in PDF")
-        return None
-    except Exception as e:
-        print(f"Error finding text position: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return None
-    finally:
-        # Clean up temp file
-        if 'tmp_file' in locals():
-            os.unlink(tmp_file.name)
-            print("Cleaned up temporary PDF file")
-
 @app.route('/api/send', methods=['POST'])
 def send_contract():
     if not request.json:
         return jsonify({"error": "No JSON data provided"}), 400
         
-    contract_text = request.json.get('contract')
+    contract = request.json.get('contract')
     signers = request.json.get('signers')
     use_ai_positioning = request.json.get('use_ai_positioning', False)
     
-    if not contract_text or not signers:
+    if not contract or not signers:
         return jsonify({"error": "Contract and signers are required"}), 400
 
     try:
         # Convert contract text to PDF
         print("Converting contract to PDF...")
-        pdf_bytes = create_pdf_from_text(contract_text)
+        pdf_bytes = create_pdf_from_text(contract)
         doc_b64 = base64.b64encode(pdf_bytes).decode('utf-8')
         
         print("Creating envelope definition...")
@@ -699,7 +731,7 @@ def send_contract():
         if use_ai_positioning:
             print("Attempting AI-based signature positioning...")
             try:
-                signature_locations = analyze_signature_locations(contract_text)
+                signature_locations = analyze_signature_locations(contract)
                 if signature_locations:
                     signature_positions = []
                     for loc in signature_locations:
@@ -845,6 +877,48 @@ def send_contract():
         traceback.print_exc()
         return jsonify({"error": f"Failed to send contract: {str(e)}"}), 500
 
+def find_text_position_in_pdf(pdf_bytes, search_text):
+    """Find the position of text in a PDF file"""
+    try:
+        # Create a temporary file to store PDF bytes
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_file:
+            temp_file.write(pdf_bytes)
+            temp_path = temp_file.name
+
+        positions = []
+        # Open the PDF with pdfplumber
+        with pdfplumber.open(temp_path) as pdf:
+            # Search each page
+            for page_num, page in enumerate(pdf.pages):
+                # Extract text and its positions
+                words = page.extract_words(x_tolerance=3, y_tolerance=3)
+                
+                # Search for the text
+                for word in words:
+                    if search_text.lower() in word['text'].lower():
+                        # Convert position to DocuSign coordinate system
+                        # DocuSign uses points from bottom-left, pdfplumber uses points from top-left
+                        x = word['x0']
+                        y = page.height - word['y0']  # Convert to bottom-up coordinate system
+                        
+                        positions.append({
+                            'page_number': page_num + 1,
+                            'x': x,
+                            'y': y,
+                            'width': word['width'],
+                            'height': word['height']
+                        })
+
+        # Clean up temporary file
+        os.unlink(temp_path)
+
+        # Return the first occurrence if found
+        return positions[0] if positions else None
+
+    except Exception as e:
+        print(f"Error finding text position: {str(e)}")
+        return None
+
 def create_pdf_from_text(text):
     from fpdf import FPDF
     
@@ -871,6 +945,66 @@ def create_pdf_from_text(text):
     
     # Get PDF as bytes
     return pdf.output(dest='S').encode('latin-1')
+
+def analyze_signature_locations(contract_text):
+    """Analyze contract text to find potential signature locations using OpenAI"""
+    try:
+        prompt = """Analyze this contract and identify where signatures should be placed. Look for:
+        1. Signature lines or blocks at the end of sections
+        2. Places marked with 'signature', 'signed by', etc.
+        3. Areas near date fields or witness blocks
+        
+        For each location found, provide:
+        1. The exact text that comes before the signature (anchor_text)
+        2. Surrounding context if the anchor text alone is ambiguous
+        3. Any additional fields needed (date, name, title, etc.)
+        
+        Contract text:
+        {text}
+        """.format(text=contract_text)
+
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a contract analysis assistant. Respond in JSON format."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+            max_tokens=1500
+        )
+
+        # Parse the response to extract signature locations
+        result = response.choices[0].message.content
+        
+        # Extract key components using GPT
+        structure_prompt = f"""
+        Based on this analysis, provide a structured JSON with:
+        1. overall_risk_score (number 1-10)
+        2. risk_summary (string)
+        3. clauses (array of objects with 'clause', 'risk_level', and 'details')
+        
+        Analysis:
+        {result}
+        """
+        
+        structure_response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a JSON formatter for legal analysis."},
+                {"role": "user", "content": structure_prompt}
+            ],
+            temperature=0
+        )
+        
+        # Parse the structured response
+        import json
+        structured_analysis = json.loads(structure_response.choices[0].message.content)
+        
+        return structured_analysis
+            
+    except Exception as e:
+        print(f"Error analyzing signature locations: {str(e)}")
+        return None
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
@@ -983,21 +1117,6 @@ class RiskService:
         except Exception as e:
             print(f"Error in risk analysis: {str(e)}")
             raise Exception(f"Failed to analyze risks: {str(e)}")
-
-# Risk Assessment Routes
-@app.route('/api/analyze/risks', methods=['POST'])
-def analyze_risks():
-    if not request.json or 'content' not in request.json:
-        return jsonify({"error": "No contract text provided"}), 400
-    
-    try:
-        contract_text = request.json['content']
-        risk_service = RiskService()
-        analysis = risk_service.analyze_contract_risks(contract_text)
-        return jsonify(analysis)
-    except Exception as e:
-        print(f"Error in risk analysis endpoint: {str(e)}")
-        return jsonify({"error": f"Risk analysis failed: {str(e)}"}), 500
 
 # Invitation Routes
 @app.route('/api/contracts/<int:contract_id>/invitations', methods=['POST'])

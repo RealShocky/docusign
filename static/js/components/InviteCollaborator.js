@@ -34,13 +34,13 @@ function InviteCollaborator({ contractId, onInviteSent }) {
         }
     };
 
-    return e('div', { className: 'invite-collaborator' },
-        e('h3', null, 'Invite Collaborator'),
-        error && e('div', { className: 'error' }, error),
-        e('form', { onSubmit: handleSubmit },
-            e('div', { className: 'form-group' },
-                e('label', null, 'Email:'),
-                e('input', {
+    return React.createElement('div', { className: 'invite-collaborator' },
+        React.createElement('h3', null, 'Invite Collaborator'),
+        error && React.createElement('div', { className: 'error' }, error),
+        React.createElement('form', { onSubmit: handleSubmit },
+            React.createElement('div', { className: 'form-group' },
+                React.createElement('label', null, 'Email:'),
+                React.createElement('input', {
                     type: 'email',
                     value: email,
                     onChange: (e) => setEmail(e.target.value),
@@ -48,19 +48,19 @@ function InviteCollaborator({ contractId, onInviteSent }) {
                     disabled: isLoading,
                 })
             ),
-            e('div', { className: 'form-group' },
-                e('label', null, 'Role:'),
-                e('select', {
+            React.createElement('div', { className: 'form-group' },
+                React.createElement('label', null, 'Role:'),
+                React.createElement('select', {
                     value: role,
                     onChange: (e) => setRole(e.target.value),
                     disabled: isLoading,
                 },
-                    e('option', { value: 'viewer' }, 'Viewer'),
-                    e('option', { value: 'editor' }, 'Editor'),
-                    e('option', { value: 'admin' }, 'Admin')
+                    React.createElement('option', { value: 'viewer' }, 'Viewer'),
+                    React.createElement('option', { value: 'editor' }, 'Editor'),
+                    React.createElement('option', { value: 'admin' }, 'Admin')
                 )
             ),
-            e('button', {
+            React.createElement('button', {
                 type: 'submit',
                 disabled: isLoading,
                 className: 'btn btn-primary'
@@ -68,3 +68,5 @@ function InviteCollaborator({ contractId, onInviteSent }) {
         )
     );
 }
+
+window.InviteCollaborator = InviteCollaborator;
