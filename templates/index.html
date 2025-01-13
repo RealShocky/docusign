@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContractIQ - Intelligent Contract Management</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
+    
+    <!-- Styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/static/css/styles.css" rel="stylesheet">
+    
+    <!-- React -->
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <!-- App -->
+    <script>
+        console.log('Loading app...');
+        // Wait for React to load
+        window.onload = function() {
+            console.log('Window loaded, React available:', !!window.React);
+            // Load app.js
+            var script = document.createElement('script');
+            script.src = '/static/js/app.js';
+            script.onload = function() {
+                console.log('App.js loaded, App available:', !!window.App);
+                // Initialize app
+                const rootElement = document.getElementById('root');
+                console.log('Root element:', rootElement);
+                ReactDOM.render(React.createElement(window.App), rootElement);
+            };
+            script.onerror = function(error) {
+                console.error('Error loading app.js:', error);
+            };
+            document.body.appendChild(script);
+        };
+    </script>
+</body>
+</html>

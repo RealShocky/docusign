@@ -1,7 +1,9 @@
-import openai
 import json
 import os
+from openai import OpenAI
 from typing import Dict, Any
+
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 class LanguageService:
     def __init__(self):
@@ -11,7 +13,7 @@ class LanguageService:
         """Convert legal language to plain English"""
         try:
             model = os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview')
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model=model,
                 messages=[
                     {"role": "system", "content": """You are a legal language simplification expert. 
@@ -42,7 +44,7 @@ class LanguageService:
                 temperature=0
             )
             
-            simplified = json.loads(response.choices[0].message['content'])
+            simplified = json.loads(response.choices[0].message.content)
             print("Contract simplification completed successfully")
             return simplified
             
@@ -58,7 +60,7 @@ class LanguageService:
     def get_term_explanation(self, term: str) -> str:
         """Get a plain English explanation of a legal term"""
         try:
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-4-1106-preview",
                 messages=[
                     {"role": "system", "content": "You are a legal terms expert. Explain legal terms in simple, plain English."},
@@ -66,7 +68,7 @@ class LanguageService:
                 ],
                 temperature=0
             )
-            return response.choices[0].message['content']
+            return response.choices[0].message.content
         except Exception as e:
             print(f"Error getting term explanation: {str(e)}")
             return f"Could not explain term: {term}"

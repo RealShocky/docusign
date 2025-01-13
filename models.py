@@ -58,9 +58,9 @@ class Tag(Base):
 class Contract(Base):
     __tablename__ = 'contracts'
     
-    id = Column(Integer, primary_key=True)
-    title = Column(String(255), nullable=False)
-    content = Column(Text, nullable=False)
+    id = Column(String, primary_key=True)
+    title = Column(String)
+    content = Column(Text)
     status = Column(String(50), default='draft')  # draft, under_review, signed, expired
     version = Column(Integer, default=1)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -74,6 +74,9 @@ class Contract(Base):
     versions = relationship("ContractVersion", back_populates="contract")
     collaborators = relationship("User", secondary=contract_collaborators)
     invitations = relationship("Invitation", backref="contract")
+
+    def __repr__(self):
+        return f"<Contract(id='{self.id}', title='{self.title}')>"
 
 class ContractVersion(Base):
     __tablename__ = 'contract_versions'

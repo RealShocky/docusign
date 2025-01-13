@@ -1,7 +1,9 @@
-import openai
 import json
 import os
+from openai import OpenAI
 from typing import List, Dict, Any
+
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 class RiskService:
     def __init__(self):
@@ -10,42 +12,38 @@ class RiskService:
             'medium': {'color': 'yellow', 'description': 'Medium risk - should be reviewed'},
             'low': {'color': 'green', 'description': 'Low risk - standard terms'}
         }
+        self.risk_prompt = """
+        Analyze the following contract for potential risks and issues. Consider:
+        1. Legal compliance
+        2. Financial risks
+        3. Liability concerns
+        4. Ambiguous language
+        5. Missing clauses
+        6. Unfavorable terms
+        
+        Provide a detailed analysis with:
+        1. Overall risk score (1-10)
+        2. Risk summary
+        3. Specific clause analysis
+        
+        Contract:
+        {contract_text}
+        """
 
     def analyze_contract_risks(self, contract_text: str) -> Dict[str, Any]:
         """Analyze contract for potential risks using GPT"""
         try:
-            model = os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview')
-            response = openai.ChatCompletion.create(
-                model=model,
+            response = client.chat.completions.create(
+                model=os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview'),
                 messages=[
-                    {"role": "system", "content": """You are a legal risk analysis expert. Analyze the contract for potential risks and issues.
-                    For each clause or section:
-                    1. Identify potential risks
-                    2. Assign a risk level (high, medium, low)
-                    3. Provide specific explanations
-                    4. Suggest improvements
-
-                    Return a JSON object with:
-                    {
-                        "overall_risk_score": 1-10,
-                        "risk_summary": "Brief summary",
-                        "clauses": [
-                            {
-                                "text": "Clause text",
-                                "risk_level": "high/medium/low",
-                                "risk_factors": ["list of specific risks"],
-                                "explanation": "Detailed explanation",
-                                "suggestions": ["list of improvements"]
-                            }
-                        ],
-                        "key_concerns": ["List of major concerns"]
-                    }"""},
-                    {"role": "user", "content": f"Analyze this contract for risks:\n\n{contract_text}"}
+                    {"role": "system", "content": "You are a legal expert analyzing contract risks."},
+                    {"role": "user", "content": self.risk_prompt.format(contract_text=contract_text)}
                 ],
-                temperature=0
+                temperature=0.7,
+                max_tokens=2000
             )
             
-            analysis = json.loads(response.choices[0].message['content'])
+            analysis = json.loads(response.choices[0].message.content)
             print("Risk analysis completed successfully")
             return analysis
             

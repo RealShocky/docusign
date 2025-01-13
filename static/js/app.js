@@ -164,6 +164,9 @@ function App() {
     const [showRiskAnalysis, setShowRiskAnalysis] = React.useState(false);
     const [customContent, setCustomContent] = React.useState('');
     const [showCustomModal, setShowCustomModal] = React.useState(false);
+    const [collaboratorEmail, setCollaboratorEmail] = React.useState('');
+    const [collaboratorRole, setCollaboratorRole] = React.useState('viewer');
+    const [collaboratorMessage, setCollaboratorMessage] = React.useState('');
 
     function openHelpModal() {
         const modal = document.createElement('div');
@@ -389,6 +392,122 @@ function App() {
             }
         } catch (error) {
             alert('Error saving settings: ' + error.message);
+        }
+    };
+
+    // Function to open invite collaborator modal
+    function openInviteModal() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-900">Invite Collaborator</h3>
+                    <button onclick="this.closest('.fixed').remove()" 
+                        class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address
+                        </label>
+                        <input type="email" id="collaboratorEmail" 
+                            value="${collaboratorEmail}"
+                            onChange={(event) => setCollaboratorEmail(event.target.value)}
+                            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter collaborator's email..."
+                            autoComplete="off"
+                            spellCheck="false"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Role
+                        </label>
+                        <select id="collaboratorRole" 
+                            value="${collaboratorRole}"
+                            onChange={(event) => setCollaboratorRole(event.target.value)}
+                            class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="viewer">Viewer (Can only view)</option>
+                            <option value="editor">Editor (Can edit and comment)</option>
+                            <option value="admin">Admin (Full access)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Message (Optional)
+                        </label>
+                        <textarea id="collaboratorMessage" 
+                            value="${collaboratorMessage}"
+                            onChange={(event) => setCollaboratorMessage(event.target.value)}
+                            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            rows="3"
+                            placeholder="Add a personal message..."
+                            spellCheck="false"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button onclick="this.closest('.fixed').remove()" 
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                        Cancel
+                    </button>
+                    <button onclick="sendInvitation()" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Send Invitation
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Add the modal to the document
+        document.body.appendChild(modal);
+
+        // Focus the email input after the modal is added
+        setTimeout(() => {
+            const emailInput = document.getElementById('collaboratorEmail');
+            if (emailInput) {
+                emailInput.focus();
+            }
+        }, 100);
+    }
+
+    const sendInvitation = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/contracts/custom/invitations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: collaboratorEmail,
+                    role: collaboratorRole,
+                    message: collaboratorMessage
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to send invitation');
+            }
+
+            // Close modal and reset form
+            setShowInviteModal(false);
+            setCollaboratorEmail('');
+            setCollaboratorRole('viewer');
+            setCollaboratorMessage('');
+
+            // Show success message
+            alert('Invitation sent successfully!');
+        } catch (error) {
+            console.error('Error sending invitation:', error);
+            alert('Failed to send invitation. Please try again.');
         }
     };
 
@@ -636,7 +755,12 @@ function App() {
     }
 
     // Display contract analysis results
-    function displayContractAnalysis(analysis) {
+    function displayContractAnalysis(result) {
+        if (!result || !result.sections) {
+            alert('No analysis results received');
+            return;
+        }
+
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
         modal.onclick = (e) => {
@@ -648,29 +772,32 @@ function App() {
         const content = document.createElement('div');
         content.className = 'bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto';
         
-        const analysisContent = analysis.sections && analysis.sections.length > 0 
-            ? analysis.sections.map(section => `
-                <div class="mb-6">
-                    <h2 class="text-xl font-semibold mb-4">${section.title}</h2>
-                    <div class="space-y-4">
-                        ${section.items ? section.items.map(item => `
-                            <div class="ml-4">
-                                <div class="text-blue-600">${item.title}</div>
-                                ${item.description ? `<div class="text-gray-700 ml-4">${item.description}</div>` : ''}
-                            </div>
-                        `).join('') : ''}
-                    </div>
-                </div>
-            `).join('')
-            : '<p>No analysis sections found.</p>';
-
         content.innerHTML = `
             <div class="space-y-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-bold">Contract Analysis</h1>
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <img src="static/images/logo.png" alt="Logo" class="h-8 w-8">
+                        <h1 class="text-2xl font-bold">Contract Analysis</h1>
+                    </div>
                     <button class="text-gray-500 hover:text-gray-700" onclick="this.closest('.fixed').remove()">×</button>
                 </div>
-                ${analysisContent}
+                
+                ${result.sections.map(section => `
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold mb-4">${section.name}</h2>
+                        <div class="space-y-4">
+                            ${section.items.map(item => `
+                                <div class="ml-4">
+                                    ${item.title ? 
+                                        `<div class="text-blue-600 font-medium">${item.title}</div>
+                                         <div class="text-gray-700 ml-4 mt-1">${item.description}</div>` :
+                                        `<div class="text-gray-700">${item.description}</div>`
+                                    }
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('')}
             </div>
         `;
 
@@ -700,12 +827,9 @@ function App() {
         
         content.innerHTML = `
             <div class="space-y-6">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center space-x-3">
-                        <img src="static/images/logo.png" alt="Logo" class="h-8 w-8">
-                        <h1 class="text-2xl font-bold">Risk Analysis Report</h1>
-                    </div>
-                    <button class="text-gray-500 hover:text-gray-700" onclick="this.closest('.fixed').remove()">×</button>
+                <div class="flex items-center space-x-3">
+                    <img src="static/images/logo.png" alt="Logo" class="h-8 w-8">
+                    <h1 class="text-2xl font-bold">Risk Analysis Report</h1>
                 </div>
                 
                 <div class="mb-6">
@@ -843,6 +967,16 @@ function App() {
             alert('Please enter contract content first');
             return;
         }
+
+        // Disable all rewrite buttons
+        const rewriteButtons = document.querySelectorAll('button[onclick*="handleRewrite"]');
+        rewriteButtons.forEach(button => {
+            button.disabled = true;
+            button.classList.add('opacity-50', 'cursor-not-allowed');
+        });
+
+        const modal = document.querySelector('.fixed');
+        const modalContent = modal.querySelector('.bg-white');
         
         try {
             console.log('Sending rewrite request:', {
@@ -875,13 +1009,40 @@ function App() {
 
             textarea.value = result.rewritten;
             
-            // Close the modal if it exists
-            const modal = document.querySelector('.fixed');
-            if (modal) modal.remove();
+            // Show success state in modal
+            if (modalContent) {
+                const successDiv = document.createElement('div');
+                successDiv.className = 'mt-4 p-4 bg-green-50 text-green-700 rounded-lg';
+                successDiv.innerHTML = `
+                    <div class="flex items-center mb-2">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Contract Updated Successfully
+                    </div>
+                    <div class="flex justify-end space-x-4 mt-4">
+                        <button onclick="this.closest('.fixed').remove()" 
+                            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                            View Updated Contract
+                        </button>
+                        <button onclick="window.handleRewrite(document.getElementById('rewriteInstructions').value)" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Rewrite Again
+                        </button>
+                    </div>
+                `;
+                modalContent.appendChild(successDiv);
+            }
             
         } catch (err) {
             console.error('Rewrite error:', err);
             alert(`Failed to rewrite contract: ${err.message}`);
+        } finally {
+            // Re-enable all rewrite buttons
+            rewriteButtons.forEach(button => {
+                button.disabled = false;
+                button.classList.remove('opacity-50', 'cursor-not-allowed');
+            });
         }
     };
 
@@ -1128,6 +1289,89 @@ function App() {
             isOpen: showCustomModal,
             onClose: () => setShowCustomModal(false)
         }),
+
+        // Invite Collaborator Modal
+        e('div', {
+            className: `fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${showInviteModal ? '' : 'hidden'}`,
+            onClick: () => setShowInviteModal(false)
+        },
+            e('div', {
+                className: 'bg-white rounded-lg p-6 max-w-md w-full mx-4',
+                onClick: e => e.stopPropagation()
+            },
+                e('div', { className: 'flex justify-between items-center mb-6' },
+                    e('h3', { className: 'text-xl font-bold text-gray-900' }, 'Invite Collaborator'),
+                    e('button', {
+                        className: 'text-gray-500 hover:text-gray-700',
+                        onClick: () => setShowInviteModal(false)
+                    },
+                        e('svg', {
+                            className: 'w-6 h-6',
+                            fill: 'none',
+                            stroke: 'currentColor',
+                            viewBox: '0 0 24 24'
+                        },
+                            e('path', {
+                                strokeLinecap: 'round',
+                                strokeLinejoin: 'round',
+                                strokeWidth: '2',
+                                d: 'M6 18L18 6M6 6l12 12'
+                            })
+                        )
+                    )
+                ),
+                e('div', { className: 'space-y-4' },
+                    e('div', null,
+                        e('label', { className: 'block text-sm font-medium text-gray-700 mb-2' }, 'Email Address'),
+                        e('input', {
+                            type: 'email',
+                            id: 'collaboratorEmail',
+                            value: collaboratorEmail,
+                            onChange: (event) => setCollaboratorEmail(event.target.value),
+                            className: 'w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                            placeholder: 'Enter collaborator\'s email...',
+                            autoComplete: 'off',
+                            spellCheck: 'false'
+                        })
+                    ),
+                    e('div', null,
+                        e('label', { className: 'block text-sm font-medium text-gray-700 mb-2' }, 'Role'),
+                        e('select', {
+                            id: 'collaboratorRole',
+                            value: collaboratorRole,
+                            onChange: (event) => setCollaboratorRole(event.target.value),
+                            className: 'w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        },
+                            e('option', { value: 'viewer' }, 'Viewer (Can only view)'),
+                            e('option', { value: 'editor' }, 'Editor (Can edit and comment)'),
+                            e('option', { value: 'admin' }, 'Admin (Full access)')
+                        )
+                    ),
+                    e('div', null,
+                        e('label', { className: 'block text-sm font-medium text-gray-700 mb-2' }, 'Message (Optional)'),
+                        e('textarea', {
+                            id: 'collaboratorMessage',
+                            value: collaboratorMessage,
+                            onChange: (event) => setCollaboratorMessage(event.target.value),
+                            className: 'w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                            rows: '3',
+                            placeholder: 'Add a personal message...',
+                            spellCheck: 'false'
+                        })
+                    )
+                ),
+                e('div', { className: 'mt-6 flex justify-end space-x-3' },
+                    e('button', {
+                        className: 'px-4 py-2 text-gray-600 hover:text-gray-800',
+                        onClick: () => setShowInviteModal(false)
+                    }, 'Cancel'),
+                    e('button', {
+                        className: 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+                        onClick: sendInvitation
+                    }, 'Send Invitation')
+                )
+            )
+        ),
 
         // Loading Overlay
         isAnalyzing && e('div', { 

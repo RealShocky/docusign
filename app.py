@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, session, send_file
 from flask_cors import CORS
 from pdf_processor import process_file
 import os
-import openai
+from openai import OpenAI
 import json
 from docusign_esign import ApiClient, EnvelopesApi, EnvelopeDefinition, Document, Signer, SignHere, Tabs, Text, DateSigned, Recipients
 import base64
@@ -10,7 +10,7 @@ from fpdf import FPDF
 import traceback
 from dotenv import load_dotenv, find_dotenv
 from flask_session import Session
-from database import init_db, Session as DBSession
+from database import init_db, Session as DBSession, generate_token
 from services.ai_service import AIService
 from services.invitation_service import InvitationService
 from typing import Dict, Any
@@ -24,6 +24,9 @@ from email.mime.text import MIMEText
 import tempfile
 import os
 from flask import has_request_context
+from datetime import datetime, timedelta
+from sqlalchemy import text
+from dateutil.tz import UTC
 
 # Load environment variables
 load_dotenv()
@@ -45,7 +48,14 @@ init_db()
 
 # Configure OpenAI
 def configure_openai():
-    openai.api_key = get_openai_key()
+    """Configure OpenAI API key"""
+    api_key = os.getenv('OPENAI_API_KEY')
+    if not api_key:
+        raise ValueError("OpenAI API key not found in environment variables")
+    return OpenAI(api_key=api_key)
+
+# Create OpenAI client
+client = configure_openai()
 
 @app.before_request
 def before_request():
@@ -95,10 +105,10 @@ print("Found .env file:", env_file)
 print("\nAPI Key Sources:")
 print("1. From os.environ:", os.environ.get('OPENAI_API_KEY', 'Not found in os.environ'))
 print("2. From os.getenv:", os.getenv('OPENAI_API_KEY', 'Not found in getenv'))
-print("3. Direct from openai.api_key:", getattr(openai, 'api_key', 'Not set in openai'))
+print("3. Direct from openai.api_key:", getattr(client, 'api_key', 'Not set in openai'))
 
 # Debug: Print final OpenAI key
-print("4. Final OpenAI API Key:", openai.api_key[:10] + '...' if openai.api_key else 'Not set')
+print("4. Final OpenAI API Key:", client.api_key[:10] + '...' if client.api_key else 'Not set')
 
 # Debug: Print environment variables
 print("Environment variables loaded:")
@@ -275,129 +285,100 @@ def analyze_contract():
         # Get model from environment variable or use default
         model = os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview')
         
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": """You are a legal expert analyzing contracts. 
-                For each contract, provide a structured analysis with the following sections:
+                Provide a structured analysis with clear section headers and items.
+                
+                Format your response exactly like this:
+                
+                SECTION: Key Terms and Definitions
+                - Term: Description of the term
+                - Another Term: Its description
 
-                1. Key Terms and Definitions
-                2. Obligations and Responsibilities
-                3. Termination and Duration
-                4. Legal Compliance
-                5. Recommendations
+                SECTION: Obligations and Responsibilities
+                - Obligation: Description
+                - Responsibility: Details
 
-                For each section, provide specific items in this format:
-                SECTION NAME:
-                - Item Title: Detailed description of the item
-                - Another Item: Its description"""},
-                {"role": "user", "content": f"Analyze this contract and provide a structured analysis with the sections and items as specified:\n\n{content}"}
+                And so on for each section. Always use 'SECTION:' to start a new section."""},
+                {"role": "user", "content": f"Analyze this contract:\n\n{content}"}
             ],
             temperature=0.7,
             max_tokens=2000
         )
         
         # Extract the analysis from the response
-        analysis = response.choices[0].message['content']
-        print("Raw analysis:", analysis)  # Debug print
+        analysis = response.choices[0].message.content
         
         # Parse the analysis into structured sections
         sections = []
         current_section = None
         current_items = []
         
-        lines = analysis.split('\n')
-        for line in lines:
+        for line in analysis.split('\n'):
             line = line.strip()
             if not line:
                 continue
-            
-            # Check if this is a section header (ends with : and is not an item)
-            if line.endswith(':') and not line.startswith('-'):
+                
+            if line.startswith('SECTION:'):
                 # Save previous section if it exists
-                if current_section and current_items:
+                if current_section:
                     sections.append({
-                        'title': current_section,
+                        'title': current_section,  # Using title instead of name
                         'items': current_items
                     })
-                current_section = line.rstrip(':')
+                current_section = line.replace('SECTION:', '').strip()
                 current_items = []
-            
-            # Check if this is an item (starts with -)
             elif line.startswith('-'):
+                # Parse item
                 item_text = line[1:].strip()
                 if ':' in item_text:
-                    title, desc = item_text.split(':', 1)
+                    title, description = item_text.split(':', 1)
                     current_items.append({
                         'title': title.strip(),
-                        'description': desc.strip()
+                        'description': description.strip()
                     })
                 else:
                     current_items.append({
-                        'title': item_text,
-                        'description': ''
+                        'title': '',
+                        'description': item_text
                     })
         
         # Add the last section
-        if current_section and current_items:
+        if current_section:
             sections.append({
                 'title': current_section,
                 'items': current_items
             })
         
-        # If no sections were found, create a default section
-        if not sections:
-            sections = [{
-                'title': 'Contract Analysis',
-                'items': [{
-                    'title': 'General Analysis',
-                    'description': analysis
-                }]
-            }]
+        return jsonify({
+            'success': True,
+            'sections': sections
+        })
         
-        print("Structured sections:", sections)  # Debug print
-        return jsonify({'sections': sections})
-
     except Exception as e:
         print(f"Error in analyze_contract: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/analyze-signature-positions', methods=['POST'])
 def analyze_signature_positions():
-    if not request.json or 'content' not in request.json:
-        return jsonify({"error": "No contract text provided"}), 400
-    
     try:
-        contract_text = request.json['content']
+        data = request.json
+        contract_text = data.get('contract_text', '')
         
-        # Use OpenAI for signature placement analysis
-        response = openai.ChatCompletion.create(
-            model="gpt-4-1106-preview",
+        response = client.chat.completions.create(
+            model=os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview'),
             messages=[
-                {"role": "system", "content": """You are a legal document analysis assistant specialized in determining optimal signature placements.
-                Analyze the contract and identify the most appropriate locations for signatures based on:
-                1. Standard signature conventions
-                2. Legal requirements
-                3. Document structure and formatting
-                4. Number of signers
-                
-                Return a JSON array where each item contains:
-                {
-                    "description": "Detailed explanation of why this is a good signature location",
-                    "anchor_text": "The text that precedes or indicates where the signature should go",
-                    "offset_type": "before" or "after" (relative to anchor_text),
-                    "align": "left", "right", or "center",
-                    "signer_role": "The role of who should sign here (e.g., 'client', 'company', etc.)"
-                }"""},
-                {"role": "user", "content": f"Analyze this contract and determine optimal signature positions:\n\n{contract_text}"}
+                {"role": "system", "content": "You are a legal expert analyzing contracts for signature positions."},
+                {"role": "user", "content": f"Analyze this contract and identify where signatures should be placed:\n\n{contract_text}"}
             ],
-            temperature=0.7
+            temperature=0.7,
+            max_tokens=1000
         )
         
         # Extract the suggestions
-        suggestions = response.choices[0].message['content']
+        suggestions = response.choices[0].message.content
         
         return jsonify({
             "success": True,
@@ -410,37 +391,34 @@ def analyze_signature_positions():
 
 @app.route('/api/analyze/risks', methods=['POST'])
 def analyze_risks():
-    if not request.json or 'content' not in request.json:
-        return jsonify({"error": "No contract text provided"}), 400
-    
     try:
-        contract_text = request.json['content']
+        data = request.json
+        contract_text = data.get('content', '')  # Changed from contract_text to match frontend
         
-        # Get model from environment variable or use default
-        model = os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview')
-        
-        response = openai.ChatCompletion.create(
-            model=model,
+        response = client.chat.completions.create(
+            model=os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview'),
             messages=[
-                {"role": "system", "content": """You are a legal expert analyzing contract risks.
-                Provide a risk analysis with:
-                1. Overall risk score (1-10)
-                2. Summary of key risks
-                3. Detailed analysis of concerning clauses
+                {"role": "system", "content": """You are a legal expert analyzing contracts for risks.
+                Format your response exactly like this:
                 
-                Format the response as:
                 RISK_SCORE: [1-10]
-                SUMMARY: [brief overview of risks]
+                SUMMARY: Brief overview of the risk assessment
+                
                 CONCERNS:
-                - [concern title] | [risk level: HIGH/MEDIUM/LOW] | [description]"""},
-                {"role": "user", "content": f"Analyze the risks in this contract:\n\n{contract_text}"}
+                - High Risk Item | HIGH | Detailed description
+                - Medium Risk | MEDIUM | Description of the issue
+                - Minor Concern | LOW | Description of minor risk
+                
+                Always use the exact headers RISK_SCORE:, SUMMARY:, and CONCERNS:
+                Risk levels must be HIGH, MEDIUM, or LOW"""},
+                {"role": "user", "content": f"Analyze this contract for risks:\n\n{contract_text}"}
             ],
             temperature=0.7,
-            max_tokens=2000
+            max_tokens=1000
         )
         
         # Extract the analysis from the response
-        analysis = response.choices[0].message['content']
+        analysis = response.choices[0].message.content
         
         # Parse the response into structured format
         lines = analysis.split('\n')
@@ -450,22 +428,24 @@ def analyze_risks():
             'concerns': []
         }
         
-        current_section = None
+        in_concerns = False
         for line in lines:
             line = line.strip()
             if not line:
                 continue
                 
             if line.startswith('RISK_SCORE:'):
-                score = line.split(':', 1)[1].strip()
                 try:
+                    score = line.split(':', 1)[1].strip()
                     result['risk_score'] = int(score)
                 except:
-                    result['risk_score'] = 5  # default score
+                    result['risk_score'] = 'N/A'
             elif line.startswith('SUMMARY:'):
                 result['summary'] = line.split(':', 1)[1].strip()
-            elif line.startswith('-'):
-                parts = line[1:].split('|')
+            elif line == 'CONCERNS:':
+                in_concerns = True
+            elif in_concerns and line.startswith('-'):
+                parts = line[1:].strip().split('|')
                 if len(parts) >= 3:
                     result['concerns'].append({
                         'title': parts[0].strip(),
@@ -481,58 +461,59 @@ def analyze_risks():
 
 @app.route('/api/rewrite', methods=['POST'])
 def rewrite_contract():
-    if not request.json:
-        return jsonify({"error": "No JSON data provided"}), 400
-        
-    content = request.json.get('content')
-    instructions = request.json.get('instructions')
-    
-    print(f"\nReceived rewrite request:")
-    print(f"Instructions: {instructions}")
-    print(f"Content length: {len(content) if content else 0} characters")
-    
-    if not content or not instructions:
-        return jsonify({"error": "Content and instructions are required"}), 400
-    
     try:
-        print("Calling OpenAI for contract rewriting...")
-        # Use OpenAI for contract rewriting
-        response = openai.ChatCompletion.create(
-            model="gpt-4-1106-preview",
+        data = request.json
+        if not data or 'content' not in data or 'instructions' not in data:
+            return jsonify({"error": "Missing content or instructions"}), 400
+            
+        contract_text = data.get('content', '')
+        instructions = data.get('instructions', '')
+        
+        response = client.chat.completions.create(
+            model=os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview'),
             messages=[
-                {"role": "system", "content": """You are a legal document assistant specializing in contract modification. 
-                Your task is to rewrite contracts according to the provided instructions while:
-                - Maintaining legal validity and enforceability
-                - Preserving the original intent and key terms
-                - Using clear, precise legal language
-                - Following standard contract formatting
-                - Including all necessary clauses and sections"""},
-                {"role": "user", "content": f"""Please rewrite this contract according to these instructions:
+                {"role": "system", "content": """You are a legal expert rewriting contracts.
+                Follow these guidelines:
+                1. Maintain all essential legal terms and clauses
+                2. Keep the same structure unless specified otherwise
+                3. Ensure all parties, dates, and key terms are preserved
+                4. Format the output as a proper legal document
+                5. Only make changes that align with the given instructions"""},
+                {"role": "user", "content": f"""Please rewrite this contract following these specific instructions:
 
 Instructions:
 {instructions}
 
 Original Contract:
-{content}"""}
+{contract_text}
+
+Provide the rewritten contract maintaining proper legal formatting."""}
             ],
-            temperature=0.7
+            temperature=0.7,
+            max_tokens=2000
         )
         
-        rewritten = response.choices[0].message['content']
-        print("Successfully rewrote contract")
-        print(f"New length: {len(rewritten)} characters")
+        rewritten = response.choices[0].message.content.strip()
+        
+        # Validate the response
+        if not rewritten:
+            raise ValueError("Received empty response from OpenAI")
+            
+        print(f"Successfully rewrote contract. New length: {len(rewritten)} characters")
         
         return jsonify({
-            "rewritten_text": rewritten,  # Changed from "rewritten" to "rewritten_text"
-            "success": True
+            "success": True,
+            "rewritten": rewritten
         })
         
     except Exception as e:
-        print("\nError occurred during rewrite:")
-        print("Error details:", str(e))
-        import traceback
-        traceback.print_exc()
-        return jsonify({"error": f"Failed to rewrite contract: {str(e)}"}), 500
+        error_msg = str(e)
+        print(f"Error in rewrite_contract: {error_msg}")
+        print(traceback.format_exc())
+        return jsonify({
+            "success": False,
+            "error": f"Failed to rewrite contract: {error_msg}"
+        }), 500
 
 @app.route('/api/templates')
 def get_templates():
@@ -920,6 +901,80 @@ def send_contract():
         traceback.print_exc()
         return jsonify({"error": f"Failed to send contract: {str(e)}"}), 500
 
+def analyze_signature_locations(contract_text):
+    """Analyze contract text to find potential signature locations using OpenAI"""
+    try:
+        # First, analyze the contract for signature locations
+        response = client.chat.completions.create(
+            model=os.getenv('OPENAI_MODEL', 'gpt-4-1106-preview'),
+            messages=[
+                {"role": "system", "content": """You are a legal expert analyzing contracts for signature placements.
+                Identify locations where signatures should be placed, considering:
+                1. Standard signature blocks
+                2. Witness signature areas
+                3. Notary sections
+                4. Initial blocks
+                5. Date fields
+                
+                Format your response exactly like this:
+                SIGNATURE_BLOCK:
+                - Position: [description of where this should be placed]
+                - Anchor Text: [exact text that appears just before or around where signature should go]
+                - Context: [broader paragraph or section containing the anchor text]
+                - Additional Fields: [list any additional fields needed, like date, title, etc.]"""},
+                {"role": "user", "content": f"Analyze this contract and identify all signature locations:\n\n{contract_text}"}
+            ],
+            temperature=0.7,
+            max_tokens=1000
+        )
+        
+        # Parse the signature locations from the response
+        locations = []
+        current_block = None
+        
+        for line in response.choices[0].message.content.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+                
+            if line == 'SIGNATURE_BLOCK:':
+                if current_block:
+                    locations.append(current_block)
+                current_block = {
+                    'position': '',
+                    'anchor_text': '',
+                    'context': '',
+                    'additional_fields': []
+                }
+            elif line.startswith('- ') and current_block:
+                key, value = line[2:].split(':', 1)
+                key = key.lower().replace(' ', '_')
+                value = value.strip()
+                
+                if key == 'additional_fields':
+                    current_block[key] = [f.strip() for f in value.strip('[]').split(',') if f.strip()]
+                else:
+                    current_block[key] = value
+        
+        # Add the last block
+        if current_block:
+            locations.append(current_block)
+            
+        # Validate and clean up the locations
+        valid_locations = []
+        for loc in locations:
+            if loc.get('anchor_text') and loc.get('context'):
+                # Ensure context includes anchor text
+                if loc['anchor_text'] not in loc['context']:
+                    loc['context'] = f"{loc['anchor_text']} {loc['context']}"
+                valid_locations.append(loc)
+        
+        return valid_locations
+            
+    except Exception as e:
+        print(f"Error analyzing signature locations: {str(e)}")
+        return None
+
 def find_text_position_in_pdf(pdf_bytes, search_text):
     """Find the position of text in a PDF file"""
     try:
@@ -989,93 +1044,21 @@ def create_pdf_from_text(text):
     # Get PDF as bytes
     return pdf.output(dest='S').encode('latin-1')
 
-def analyze_signature_locations(contract_text):
-    """Analyze contract text to find potential signature locations using OpenAI"""
-    try:
-        prompt = """Analyze this contract and identify where signatures should be placed. Look for:
-        1. Signature lines or blocks at the end of sections
-        2. Places marked with 'signature', 'signed by', etc.
-        3. Areas near date fields or witness blocks
-        
-        For each location found, provide:
-        1. The exact text that comes before the signature (anchor_text)
-        2. Surrounding context if the anchor text alone is ambiguous
-        3. Any additional fields needed (date, name, title, etc.)
-        
-        Contract text:
-        {text}
-        """.format(text=contract_text)
-
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a contract analysis assistant. Respond in JSON format."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3,
-            max_tokens=1500
-        )
-
-        # Parse the response to extract signature locations
-        result = response.choices[0].message.content
-        
-        # Extract key components using GPT
-        structure_prompt = f"""
-        Based on this analysis, provide a structured JSON with:
-        1. overall_risk_score (number 1-10)
-        2. risk_summary (string)
-        3. clauses (array of objects with 'clause', 'risk_level', and 'details')
-        
-        Analysis:
-        {result}
-        """
-        
-        structure_response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a JSON formatter for legal analysis."},
-                {"role": "user", "content": structure_prompt}
-            ],
-            temperature=0
-        )
-        
-        # Parse the structured response
-        import json
-        structured_analysis = json.loads(structure_response.choices[0].message.content)
-        
-        return structured_analysis
-            
-    except Exception as e:
-        print(f"Error analyzing signature locations: {str(e)}")
-        return None
-
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = os.getenv('GMAIL_USER')  # Your Gmail address
 SENDER_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')  # Your Gmail App Password
 
-def send_email(recipient_email, recipient_name, contract_content):
+def send_email(recipient_email, recipient_name, content, subject):
     try:
         # Create message
         msg = MIMEMultipart()
         msg['From'] = SENDER_EMAIL
         msg['To'] = recipient_email
-        msg['Subject'] = "Contract for Signature"
+        msg['Subject'] = subject
 
         # Email body
-        body = f"""Hello {recipient_name},
-
-A contract has been sent to you for review and signature.
-
-Contract Details:
-{contract_content[:500]}... [Contract Preview]
-
-Please review and sign the contract at your earliest convenience.
-
-Best regards,
-Document Signing System"""
-
-        msg.attach(MIMEText(body, 'plain'))
+        msg.attach(MIMEText(content, 'plain'))
 
         # Create SMTP session
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
@@ -1119,8 +1102,8 @@ class RiskService:
             analysis_prompt = self.risk_prompt.format(contract_text=contract_text)
             
             # Get analysis from GPT
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
+            response = client.chat.completions.create(
+                model="gpt-4-1106-preview",
                 messages=[
                     {"role": "system", "content": "You are a legal expert specializing in contract risk analysis."},
                     {"role": "user", "content": analysis_prompt}
@@ -1142,8 +1125,8 @@ class RiskService:
             {analysis_text}
             """
             
-            structure_response = openai.ChatCompletion.create(
-                model="gpt-4",
+            structure_response = client.chat.completions.create(
+                model="gpt-4-1106-preview",
                 messages=[
                     {"role": "system", "content": "You are a JSON formatter for legal analysis."},
                     {"role": "user", "content": structure_prompt}
@@ -1162,39 +1145,200 @@ class RiskService:
             raise Exception(f"Failed to analyze risks: {str(e)}")
 
 # Invitation Routes
-@app.route('/api/contracts/<int:contract_id>/invitations', methods=['POST'])
+@app.route('/docusign/accept-invitation/<token>', methods=['GET'])
+def accept_invitation_page(token):
+    try:
+        db = get_db()
+        # Get invitation details
+        result = db.execute(text("""
+            SELECT * FROM invitations 
+            WHERE token = :token AND status = 'pending' 
+            AND expires_at > :current_time
+            """), {
+                'token': token,
+                'current_time': datetime.now(UTC)
+            }).fetchone()
+        
+        if not result:
+            return """
+            <html>
+                <head>
+                    <title>Invalid or Expired Invitation</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 40px; }
+                        .container { max-width: 600px; margin: 0 auto; text-align: center; }
+                        .error { color: #dc3545; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1 class="error">Invalid or Expired Invitation</h1>
+                        <p>This invitation link is either invalid or has expired.</p>
+                        <p><a href="https://vibrationrobotics.com/docusign">Return to Dashboard</a></p>
+                    </div>
+                </body>
+            </html>
+            """
+        
+        # Update invitation status
+        db.execute(text("""
+            UPDATE invitations 
+            SET status = 'accepted' 
+            WHERE token = :token
+            """), {'token': token})
+        db.commit()
+        
+        return """
+        <html>
+            <head>
+                <title>Invitation Accepted</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; }
+                    .container { max-width: 600px; margin: 0 auto; text-align: center; }
+                    .success { color: #28a745; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1 class="success">Invitation Accepted!</h1>
+                    <p>You can now collaborate on the contract.</p>
+                    <p>Please check your email for further instructions.</p>
+                    <p><a href="https://vibrationrobotics.com/docusign">Go to Dashboard</a></p>
+                </div>
+            </body>
+        </html>
+        """
+        
+    except Exception as e:
+        print(f"Error accepting invitation: {str(e)}")
+        return """
+        <html>
+            <head>
+                <title>Error</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; }
+                    .container { max-width: 600px; margin: 0 auto; text-align: center; }
+                    .error { color: #dc3545; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1 class="error">Error</h1>
+                    <p>An error occurred while processing your invitation.</p>
+                    <p><a href="https://vibrationrobotics.com/docusign">Return to Dashboard</a></p>
+                </div>
+            </body>
+        </html>
+        """
+    finally:
+        db.close()
+
+@app.route('/api/contracts/<contract_id>/invitations', methods=['POST'])
 def invite_collaborator(contract_id):
     try:
         data = request.get_json()
         email = data.get('email')
         role = data.get('role', 'viewer')
+        message = data.get('message', '')
         
         if not email:
             return jsonify({'error': 'Email is required'}), 400
+
+        # Create invitation in database
+        db = get_db()
+        try:
+            # Generate a secure token for the invitation
+            token = generate_token()
             
-        invitation = invitation_service.create_invitation(contract_id, email, role)
-        return jsonify({
-            'id': invitation.id,
-            'email': invitation.email,
-            'role': invitation.role,
-            'status': invitation.status,
-            'expires_at': invitation.expires_at.isoformat()
-        }), 201
+            # Set creation and expiration times
+            now = datetime.now(UTC)
+            expires_at = now + timedelta(days=7)  # Invitation expires in 7 days
+            
+            # Create invitation using SQLAlchemy
+            result = db.execute(text("""
+                INSERT INTO invitations (contract_id, email, role, message, status, token, created_at, expires_at)
+                VALUES (:contract_id, :email, :role, :message, :status, :token, :created_at, :expires_at)
+                RETURNING id
+                """), {
+                    'contract_id': contract_id,
+                    'email': email,
+                    'role': role,
+                    'message': message,
+                    'status': 'pending',
+                    'token': token,
+                    'created_at': now,
+                    'expires_at': expires_at
+                })
+            invitation_id = result.scalar()
+            db.commit()
+
+            # Send email notification
+            try:
+                send_email(
+                    recipient_email=email,
+                    recipient_name=email.split('@')[0],
+                    content=f"""
+                    You've been invited to collaborate on a contract with the role of {role}.
+                    
+                    {message if message else ''}
+                    
+                    Click here to accept the invitation: https://vibrationrobotics.com/docusign/accept-invitation/{token}
+                    
+                    This invitation will expire on {expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}
+                    """,
+                    subject="Contract Collaboration Invitation"
+                )
+            except Exception as e:
+                print(f"Failed to send email: {str(e)}")
+                # Continue even if email fails
+                
+            return jsonify({
+                'id': invitation_id,
+                'email': email,
+                'role': role,
+                'status': 'pending',
+                'message': message,
+                'expires_at': expires_at.isoformat()
+            }), 201
+
+        except Exception as e:
+            print(f"Database error: {str(e)}")
+            db.rollback()
+            raise e
+        finally:
+            db.close()
+            
     except Exception as e:
+        print(f"Error in invite_collaborator: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/contracts/<int:contract_id>/invitations', methods=['GET'])
+@app.route('/api/contracts/<contract_id>/invitations', methods=['GET'])
 def list_invitations(contract_id):
     try:
-        invitations = invitation_service.list_invitations(contract_id)
-        return jsonify([{
-            'id': inv.id,
-            'email': inv.email,
-            'role': inv.role,
-            'status': inv.status,
-            'expires_at': inv.expires_at.isoformat()
-        } for inv in invitations]), 200
+        db = DBSession()
+        try:
+            result = db.execute(text("""
+                SELECT id, email, role, status, created_at
+                FROM invitations
+                WHERE contract_id = :contract_id
+                ORDER BY created_at DESC
+                """), {'contract_id': contract_id})
+            
+            invitations = result.fetchall()
+            
+            return jsonify([{
+                'id': inv[0],
+                'email': inv[1],
+                'role': inv[2],
+                'status': inv[3],
+                'created_at': inv[4].isoformat() if inv[4] else None
+            } for inv in invitations]), 200
+            
+        finally:
+            db.close()
+            
     except Exception as e:
+        print(f"Error in list_invitations: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/invitations/<token>/accept', methods=['POST'])
