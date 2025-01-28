@@ -1,15 +1,61 @@
-# Enable rewrite engine
+# Enable rewrite engine and options
 RewriteEngine On
 RewriteBase /docusign/
+Options -Indexes +FollowSymLinks
 
 # Set MIME types
 AddType application/javascript .js
 AddType text/css .css
 
+# Security Headers
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
 # Enable CORS
 Header set Access-Control-Allow-Origin "*"
 Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
 Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+# Block malicious request patterns
+<IfModule mod_headers.c>
+    Header always unset Server
+    Header always unset X-Powered-By
+</IfModule>
+
+# Block common attack patterns
+<IfModule mod_rewrite.c>
+    # Block sensitive file access attempts
+    RewriteCond %{REQUEST_URI} \.(env|aws|conf|json|properties|txt|xml|php|config)$ [NC,OR]
+    RewriteCond %{REQUEST_URI} (wp-config|phpinfo|test|info|robots|sitemap) [NC,OR]
+    # Block suspicious paths
+    RewriteCond %{REQUEST_URI} ^/(config|admin|backend|laravel|crm|blog|api/env|\.aws) [NC,OR]
+    # Block malformed requests and binary data
+    RewriteCond %{THE_REQUEST} (\\x|%0|%00|%0A|%0D|\\x00|\\x0A|\\x0D) [NC,OR]
+    # Block RDP/proxy attempts
+    RewriteCond %{THE_REQUEST} (CONNECT|mstshash) [NC,OR]
+    RewriteCond %{HTTP:Cookie} mstshash [NC]
+    RewriteRule .* - [F]
+</IfModule>
+
+# Strict method limitations
+<LimitExcept GET POST OPTIONS>
+    Order deny,allow
+    Deny from all
+</LimitExcept>
+
+# Protect sensitive files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Only allow access to specific JS files
+<FilesMatch "^(app|Header|TemplateCard|ContractTemplates|CollaboratorsList|InviteCollaborator)\.js$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
 
 # Redirect all requests to index.html for SPA routing
 RewriteRule ^index\.html$ - [L]
