@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="50" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .title { font: bold 24px sans-serif; fill: #2563eb; }
+    .subtitle { font: 12px sans-serif; fill: #64748b; }
+  </style>
+  <text x="10" y="30" class="title">ContractIQ</text>
+  <text x="10" y="45" class="subtitle">Smart Contract Analysis</text>
+</svg>
